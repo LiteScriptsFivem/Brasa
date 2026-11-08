@@ -30,6 +30,11 @@ namespace Brasa
         RichTextBox registro;
         string ultimoEstadoBandeja = "";
         VentanaMigrar ventanaMigrar;
+        readonly Action<string, bool> alRegistro;
+        readonly bool reabierta;
+        ComboBox cmbIdioma;
+        /// true si se ha cerrado para volver a abrirse en otro idioma
+        public bool CambioIdioma { get; private set; }
 
         class FilaServicio
         {
@@ -40,8 +45,9 @@ namespace Brasa
             public BotonR Accion, Log;
         }
 
-        public Ventana(Motor motor, Ajustes ajustes, string exe, bool minimizado)
+        public Ventana(Motor motor, Ajustes ajustes, string exe, bool minimizado, bool reabierta = false)
         {
+            this.reabierta = reabierta;
             this.motor = motor;
             this.ajustes = ajustes;
             this.exe = exe;
@@ -57,7 +63,7 @@ namespace Brasa
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
             Font = Tema.Fuente(9f);
-            Text = "Brasa — Servidor local";
+            Text = L.T("Brasa — Servidor local");
             Icon = Recursos.Icono("brasa.ico", 32);
             BackColor = Tema.Fondo;
             ForeColor = Tema.Texto;
@@ -71,65 +77,69 @@ namespace Brasa
             var titulo = Tema.Etiqueta("Brasa", 19f, Tema.Texto, FontStyle.Bold);
             titulo.Location = new Point(80, 10);
             Controls.Add(titulo);
-            var sub = Tema.Etiqueta("Servidor local  ·  Apache  ·  PHP  ·  MariaDB  ·  by LiteScripts", 9f, Tema.Tenue);
+            var sub = Tema.Etiqueta(L.T("Servidor local  ·  Apache  ·  PHP  ·  MariaDB  ·  by LiteScripts"), 9f, Tema.Tenue);
             sub.Location = new Point(83, 48);
             Controls.Add(sub);
 
             var pill = new Tarjeta { Location = new Point(660, 24), Size = new Size(200, 36) };
             puntoGlobal = new Punto { Location = new Point(12, 9), Size = new Size(18, 18) };
-            lblGlobal = Tema.Etiqueta("Comprobando...", 9.5f, Tema.Texto, FontStyle.Bold);
+            lblGlobal = Tema.Etiqueta(L.T("Comprobando..."), 9.5f, Tema.Texto, FontStyle.Bold);
             lblGlobal.AutoSize = false;
             lblGlobal.TextAlign = ContentAlignment.MiddleLeft;
             lblGlobal.Bounds = new Rectangle(36, 7, 156, 22);
             pill.Controls.AddRange(new Control[] { puntoGlobal, lblGlobal });
             Controls.Add(pill);
 
+            cmbIdioma = L.Selector(CambiarIdioma);
+            cmbIdioma.SetBounds(540, 31, 108, 24);
+            Controls.Add(cmbIdioma);
+
             Controls.Add(new Separador { Bounds = new Rectangle(0, 82, 880, 1) });
 
             // ================= Columna izquierda =================
-            Controls.Add(Tema.Seccion("SERVICIOS", 22, 98));
+            Controls.Add(Tema.Seccion(L.T("SERVICIOS"), 22, 98));
             filaApache = CrearFila(motor.Apache, "Apache + PHP", 120);
             filaMaria = CrearFila(motor.MariaDB, "MariaDB", 216);
 
-            btnTodo = Tema.Boton1("Encender todo", true);
+            btnTodo = Tema.Boton1(L.T("Encender todo"), true);
             btnTodo.SetBounds(20, 316, 136, 42);
             btnTodo.Click += (s, e) => EncenderTodo(false);
-            btnApagarTodo = Tema.Boton1("Apagar todo");
+            btnApagarTodo = Tema.Boton1(L.T("Apagar todo"));
             btnApagarTodo.SetBounds(162, 316, 136, 42);
             btnApagarTodo.Click += (s, e) => ApagarTodo(null);
-            btnReiniciar = Tema.Boton1("Reiniciar");
+            btnReiniciar = Tema.Boton1(L.T("Reiniciar"));
             btnReiniciar.SetBounds(304, 316, 136, 42);
             btnReiniciar.Click += (s, e) => ApagarTodo(() => EncenderTodo(false));
             Controls.AddRange(new Control[] { btnTodo, btnApagarTodo, btnReiniciar });
 
-            Controls.Add(Tema.Seccion("OPCIONES", 22, 376));
-            chkWindows = Opcion("Arrancar con Windows", 20, 398, Sistema.InicioConWindows);
-            chkAuto = Opcion("Encender servidores al abrir", 20, 424, ajustes.Bool("AutoEncender", true));
-            chkVigilante = Opcion("Vigilante (reinicia si se cae)", 232, 398, ajustes.Bool("Vigilante", true));
-            chkCopia = Opcion("Copia de seguridad diaria", 232, 424, ajustes.Bool("CopiaDiaria", true));
+            Controls.Add(Tema.Seccion(L.T("OPCIONES"), 22, 376));
+            chkWindows = Opcion(L.T("Arrancar con Windows"), 20, 398, Sistema.InicioConWindows);
+            chkAuto = Opcion(L.T("Encender servidores al abrir"), 20, 424, ajustes.Bool("AutoEncender", true));
+            chkVigilante = Opcion(L.T("Vigilante (reinicia si se cae)"), 232, 398, ajustes.Bool("Vigilante", true));
+            chkCopia = Opcion(L.T("Copia de seguridad diaria"), 232, 424, ajustes.Bool("CopiaDiaria", true));
             chkWindows.CheckedChanged += (s, e) =>
             {
                 try { Sistema.PonerInicioConWindows(chkWindows.Checked, exe); }
-                catch (Exception ex) { Escribir("No se pudo cambiar el inicio con Windows: " + ex.Message, true); }
+                catch (Exception ex) { Escribir(L.T("No se pudo cambiar el inicio con Windows: ") + ex.Message, true); }
             };
             chkAuto.CheckedChanged += (s, e) => GuardarAjuste("AutoEncender", chkAuto.Checked);
             chkVigilante.CheckedChanged += (s, e) => GuardarAjuste("Vigilante", chkVigilante.Checked);
             chkCopia.CheckedChanged += (s, e) => GuardarAjuste("CopiaDiaria", chkCopia.Checked);
 
             // ================= Columna derecha =================
-            Controls.Add(Tema.Seccion("ACCESOS RÁPIDOS", 462, 98));
-            Acceso("Abrir web", 0, 0, (s, e) => AbrirWeb(""));
+            Controls.Add(Tema.Seccion(L.T("ACCESOS RÁPIDOS"), 462, 98));
+            Acceso(L.T("Abrir web"), 0, 0, (s, e) => AbrirWeb(""));
             Acceso("phpMyAdmin", 1, 0, (s, e) => AbrirWeb("phpmyadmin/"));
-            Acceso("Carpeta www", 0, 1, (s, e) => AbrirCarpeta(motor.DirWww));
-            Acceso("Ver copias", 1, 1, (s, e) => AbrirCarpeta(motor.DirBackups));
-            Acceso("Copia de seguridad", 0, 2, (s, e) => HacerCopia());
-            Acceso("Importar .sql", 1, 2, (s, e) => ImportarSql());
-            var migrar = Tema.Boton2("Migrar desde XAMPP", EstiloBoton.Contorno);
+            Acceso(L.T("Carpeta www"), 0, 1, (s, e) => AbrirCarpeta(motor.DirWww));
+            Acceso(L.T("Ver copias"), 1, 1, (s, e) => AbrirCarpeta(motor.DirBackups));
+            Acceso(L.T("Copia de seguridad"), 0, 2, (s, e) => HacerCopia());
+            Acceso(L.T("Importar .sql"), 1, 2, (s, e) => ImportarSql());
+            var migrar = Tema.Boton2(L.T("Migrar desde XAMPP"), EstiloBoton.Contorno);
             migrar.SetBounds(460, 246, 400, 36);
             migrar.Click += (s, e) => AbrirMigracion();
             Controls.Add(migrar);
 
-            Controls.Add(Tema.Seccion("ACTIVIDAD", 462, 300));
+            Controls.Add(Tema.Seccion(L.T("ACTIVIDAD"), 462, 300));
             registro = Tema.CajaTexto(new Rectangle(460, 322, 400, 128));
             Controls.Add(registro);
 
@@ -138,19 +148,19 @@ namespace Brasa
             var lt = new LogoLT() { Location = new Point(14, 12), Size = new Size(50, 50) };
             var ltNombre = Tema.Etiqueta("LiteScripts", 11f, Tema.Azul, FontStyle.Bold);
             ltNombre.Location = new Point(74, 10);
-            var ltTexto = Tema.Etiqueta("Brasa es gratis  ·  Desarrollado por hotbambi  ·  v" + Terminos.Version, 8.5f, Tema.Tenue);
+            var ltTexto = Tema.Etiqueta(L.T("Brasa es gratis  ·  Desarrollado por hotbambi") + "  ·  v" + Terminos.Version, 8.5f, Tema.Tenue);
             ltTexto.Location = new Point(76, 33);
             var terminos = new LinkLabel
             {
-                Text = "Términos y condiciones", AutoSize = true, Location = new Point(76, 51), Font = Tema.Fuente(8.5f),
+                Text = L.T("Términos y condiciones"), AutoSize = true, Location = new Point(76, 51), Font = Tema.Fuente(8.5f),
                 LinkColor = Tema.Acento, ActiveLinkColor = Tema.AcentoHover, VisitedLinkColor = Tema.Acento, BackColor = Color.Transparent,
                 LinkBehavior = LinkBehavior.HoverUnderline,
             };
-            terminos.LinkClicked += (s, e) => { using (var v = new VentanaTexto("Términos y condiciones", Terminos.Texto)) v.ShowDialog(this); };
+            terminos.LinkClicked += (s, e) => { using (var v = new VentanaTexto(L.T("Términos y condiciones"), Terminos.Texto)) v.ShowDialog(this); };
             var discord = Tema.Boton2("Discord", EstiloBoton.Discord);
             discord.SetBounds(560, 18, 128, 38);
             discord.Click += (s, e) => Enlaces.Abrir(Enlaces.Discord);
-            var tienda = Tema.Boton2("Tienda", EstiloBoton.Principal);
+            var tienda = Tema.Boton2(L.T("Tienda"), EstiloBoton.Principal);
             tienda.SetBounds(698, 18, 128, 38);
             tienda.Click += (s, e) => Enlaces.Abrir(Enlaces.Tienda);
             pie.Controls.AddRange(new Control[] { lt, ltNombre, ltTexto, terminos, discord, tienda });
@@ -168,7 +178,8 @@ namespace Brasa
             bandeja.MouseClick += (s, e) => { if (e.Button == MouseButtons.Left) Mostrar(); };
             bandeja.BalloonTipClicked += (s, e) => Mostrar();
 
-            motor.Registro += (m, err) => { if (IsHandleCreated && !IsDisposed) try { BeginInvoke(new Action(() => Escribir(m, err))); } catch { } };
+            alRegistro = (m, err) => { if (IsHandleCreated && !IsDisposed) try { BeginInvoke(new Action(() => Escribir(m, err))); } catch { } };
+            motor.Registro += alRegistro;
 
             reloj.Interval = 1500;
             reloj.Tick += (s, e) => Tic();
@@ -198,7 +209,7 @@ namespace Brasa
             f.Log = Tema.Boton1("Log");
             f.Log.SetBounds(276, 24, 48, 34);
             f.Log.Click += (o, e) => VerLog(s);
-            f.Accion = Tema.Boton1("Encender", true);
+            f.Accion = Tema.Boton1(L.T("Encender"), true);
             f.Accion.SetBounds(330, 24, 78, 34);
             f.Accion.Click += (o, e) => AlternarServicio(s);
 
@@ -234,27 +245,27 @@ namespace Brasa
         {
             menu.ShowImageMargin = false;
             menu.Font = Tema.Fuente(9.5f);
-            miEstado = new ToolStripMenuItem("Comprobando...") { Enabled = false };
+            miEstado = new ToolStripMenuItem(L.T("Comprobando...")) { Enabled = false };
             menu.Items.Add(miEstado);
             menu.Items.Add(new ToolStripSeparator());
-            var abrir = new ToolStripMenuItem("Abrir Brasa", null, (s, e) => Mostrar());
+            var abrir = new ToolStripMenuItem(L.T("Abrir Brasa"), null, (s, e) => Mostrar());
             abrir.Font = new Font(menu.Font, FontStyle.Bold);
             menu.Items.Add(abrir);
             menu.Items.Add(new ToolStripSeparator());
-            menu.Items.Add("Encender todo", null, (s, e) => EncenderTodo(false));
-            menu.Items.Add("Apagar todo", null, (s, e) => ApagarTodo(null));
-            menu.Items.Add("Reiniciar", null, (s, e) => ApagarTodo(() => EncenderTodo(false)));
+            menu.Items.Add(L.T("Encender todo"), null, (s, e) => EncenderTodo(false));
+            menu.Items.Add(L.T("Apagar todo"), null, (s, e) => ApagarTodo(null));
+            menu.Items.Add(L.T("Reiniciar"), null, (s, e) => ApagarTodo(() => EncenderTodo(false)));
             menu.Items.Add(new ToolStripSeparator());
-            menu.Items.Add("Abrir web", null, (s, e) => AbrirWeb(""));
+            menu.Items.Add(L.T("Abrir web"), null, (s, e) => AbrirWeb(""));
             menu.Items.Add("phpMyAdmin", null, (s, e) => AbrirWeb("phpmyadmin/"));
-            menu.Items.Add("Carpeta www", null, (s, e) => AbrirCarpeta(motor.DirWww));
-            menu.Items.Add("Copia de seguridad ahora", null, (s, e) => HacerCopia());
-            menu.Items.Add("Migrar desde XAMPP...", null, (s, e) => AbrirMigracion());
+            menu.Items.Add(L.T("Carpeta www"), null, (s, e) => AbrirCarpeta(motor.DirWww));
+            menu.Items.Add(L.T("Copia de seguridad ahora"), null, (s, e) => HacerCopia());
+            menu.Items.Add(L.T("Migrar desde XAMPP..."), null, (s, e) => AbrirMigracion());
             menu.Items.Add(new ToolStripSeparator());
-            menu.Items.Add("Discord de LiteScripts", null, (s, e) => Enlaces.Abrir(Enlaces.Discord));
-            menu.Items.Add("Tienda LiteScripts", null, (s, e) => Enlaces.Abrir(Enlaces.Tienda));
+            menu.Items.Add(L.T("Discord de LiteScripts"), null, (s, e) => Enlaces.Abrir(Enlaces.Discord));
+            menu.Items.Add(L.T("Tienda LiteScripts"), null, (s, e) => Enlaces.Abrir(Enlaces.Tienda));
             menu.Items.Add(new ToolStripSeparator());
-            menu.Items.Add("Salir (apaga el servidor)", null, (s, e) => Salir(true));
+            menu.Items.Add(L.T("Salir (apaga el servidor)"), null, (s, e) => Salir(true));
         }
 
         // ================= Ciclo de vida =================
@@ -277,7 +288,7 @@ namespace Brasa
                 f.Version.Top = f.Nombre.Top + (f.Nombre.Height - f.Version.Height) / 2 + 1;
             }
 
-            Escribir("Brasa listo. Al cerrar con la X sigue funcionando junto al reloj.");
+            Escribir(L.T("Brasa listo. Al cerrar con la X sigue funcionando junto al reloj."));
             motor.Refrescar(motor.Apache);
             motor.Refrescar(motor.MariaDB);
             if (motor.Apache.Estado == Estado.Encendido) motor.Apache.Deseado = true;
@@ -291,10 +302,10 @@ namespace Brasa
 
             if (!motor.Instalado)
             {
-                Escribir("Brasa no está instalado del todo en esta carpeta. Abre Brasa-Instalador.exe otra vez.", true);
+                Escribir(L.T("Brasa no está instalado del todo en esta carpeta. Abre Brasa-Instalador.exe otra vez."), true);
                 return;
             }
-            if (ajustes.Bool("AutoEncender", true)) EncenderTodo(true);
+            if (!reabierta && ajustes.Bool("AutoEncender", true)) EncenderTodo(true);
         }
 
         void Mostrar()
@@ -319,7 +330,7 @@ namespace Brasa
                 Hide();
                 if (!ajustes.Bool("AvisoBandeja", false))
                 {
-                    bandeja.ShowBalloonTip(4000, "Brasa sigue funcionando", "Lo tienes aquí, junto al reloj. Clic para abrirlo; clic derecho para el menú.", ToolTipIcon.Info);
+                    bandeja.ShowBalloonTip(4000, L.T("Brasa sigue funcionando"), L.T("Lo tienes aquí, junto al reloj. Clic para abrirlo; clic derecho para el menú."), ToolTipIcon.Info);
                     GuardarAjuste("AvisoBandeja", true);
                 }
                 return;
@@ -336,17 +347,17 @@ namespace Brasa
         void Salir(bool preguntar)
         {
             if (saliendo) return;
-            if (motor.Migrando) { Mostrar(); Escribir("Espera a que termine la migración antes de salir.", true); return; }
+            if (motor.Migrando) { Mostrar(); Escribir(L.T("Espera a que termine la migración antes de salir."), true); return; }
             bool hayAlgo = motor.Apache.Estado != Estado.Apagado || motor.MariaDB.Estado != Estado.Apagado;
             if (preguntar && hayAlgo)
             {
-                var r = MessageBox.Show("Se apagarán Apache y MariaDB y Brasa se cerrará.\n\n¿Salir?", "Brasa", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                var r = MessageBox.Show(L.T("Se apagarán Apache y MariaDB y Brasa se cerrará.\n\n¿Salir?"), "Brasa", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (r != DialogResult.Yes) return;
             }
             saliendo = true;
             reloj.Stop();
-            Escribir("Apagando todo para salir...");
-            bandeja.Text = "Brasa — apagando...";
+            Escribir(L.T("Apagando todo para salir..."));
+            bandeja.Text = L.T("Brasa — apagando...");
             ThreadPool.QueueUserWorkItem(_ =>
             {
                 try { motor.Parar(motor.Apache); motor.Parar(motor.MariaDB); } catch { }
@@ -368,7 +379,7 @@ namespace Brasa
             ThreadPool.QueueUserWorkItem(_ =>
             {
                 try { trabajo(); }
-                catch (Exception ex) { try { BeginInvoke(new Action(() => Escribir("Error: " + ex.Message, true))); } catch { } }
+                catch (Exception ex) { try { BeginInvoke(new Action(() => Escribir(L.T("Error: ") + ex.Message, true))); } catch { } }
                 finally
                 {
                     Interlocked.Decrement(ref operaciones);
@@ -379,19 +390,19 @@ namespace Brasa
 
         void EncenderTodo(bool silencioso)
         {
-            if (!motor.Instalado) { Escribir("Brasa no está instalado del todo. Abre Brasa-Instalador.exe otra vez.", true); return; }
+            if (!motor.Instalado) { Escribir(L.T("Brasa no está instalado del todo. Abre Brasa-Instalador.exe otra vez."), true); return; }
             EnSegundoPlano(() =>
             {
                 bool okDb = motor.Arrancar(motor.MariaDB);
                 bool okWeb = motor.Arrancar(motor.Apache);
                 if (okDb && ajustes.Bool("CopiaDiaria", true) && !motor.HayCopiaDeHoy())
-                    motor.CopiaSeguridad("automática diaria");
+                    motor.CopiaSeguridad(L.T("automática diaria"));
                 BeginInvoke(new Action(() =>
                 {
                     if (!(okDb && okWeb))
-                        bandeja.ShowBalloonTip(5000, "Brasa", "Algo no ha arrancado. Abre Brasa para ver el motivo.", ToolTipIcon.Warning);
+                        bandeja.ShowBalloonTip(5000, "Brasa", L.T("Algo no ha arrancado. Abre Brasa para ver el motivo."), ToolTipIcon.Warning);
                     else if (!Visible)
-                        bandeja.ShowBalloonTip(3000, "Brasa", "Servidor encendido en " + UrlBase(), ToolTipIcon.Info);
+                        bandeja.ShowBalloonTip(3000, "Brasa", L.T("Servidor encendido en ") + UrlBase(), ToolTipIcon.Info);
                 }));
             });
         }
@@ -404,7 +415,7 @@ namespace Brasa
         void AlternarServicio(Servicio s)
         {
             if (s.Estado == Estado.Encendido || s.Estado == Estado.Arrancando) EnSegundoPlano(() => motor.Parar(s));
-            else if (!motor.Instalado) Escribir("Brasa no está instalado del todo. Abre Brasa-Instalador.exe otra vez.", true);
+            else if (!motor.Instalado) Escribir(L.T("Brasa no está instalado del todo. Abre Brasa-Instalador.exe otra vez."), true);
             else EnSegundoPlano(() => motor.Arrancar(s));
         }
 
@@ -415,7 +426,7 @@ namespace Brasa
 
         void AbrirWeb(string ruta)
         {
-            if (motor.Apache.Estado != Estado.Encendido) Escribir("Ojo: Apache está apagado, la página no cargará.", true);
+            if (motor.Apache.Estado != Estado.Encendido) Escribir(L.T("Ojo: Apache está apagado, la página no cargará."), true);
             Enlaces.Abrir(UrlBase() + ruta);
         }
 
@@ -426,13 +437,13 @@ namespace Brasa
                 Directory.CreateDirectory(ruta);
                 Process.Start("explorer.exe", "\"" + ruta + "\"");
             }
-            catch (Exception ex) { Escribir("No se pudo abrir la carpeta: " + ex.Message, true); }
+            catch (Exception ex) { Escribir(L.T("No se pudo abrir la carpeta: ") + ex.Message, true); }
         }
 
         void VerLog(Servicio s)
         {
             var archivo = motor.ArchivoLog(s);
-            if (archivo == null || !File.Exists(archivo)) { Escribir("Todavía no hay registro de " + s.Nombre + ".", true); return; }
+            if (archivo == null || !File.Exists(archivo)) { Escribir(L.F("Todavía no hay registro de {0}.", s.Nombre), true); return; }
             try { Process.Start("notepad.exe", "\"" + archivo + "\""); }
             catch (Exception ex) { Escribir(ex.Message, true); }
         }
@@ -442,26 +453,26 @@ namespace Brasa
             EnSegundoPlano(() =>
             {
                 var f = motor.CopiaSeguridad(null);
-                if (f != null) BeginInvoke(new Action(() => bandeja.ShowBalloonTip(3000, "Copia de seguridad hecha", Path.GetFileName(f), ToolTipIcon.Info)));
+                if (f != null) BeginInvoke(new Action(() => bandeja.ShowBalloonTip(3000, L.T("Copia de seguridad hecha"), Path.GetFileName(f), ToolTipIcon.Info)));
             });
         }
 
         void ImportarSql()
         {
-            if (motor.MariaDB.Estado != Estado.Encendido) { Escribir("Enciende MariaDB antes de importar.", true); return; }
+            if (motor.MariaDB.Estado != Estado.Encendido) { Escribir(L.T("Enciende MariaDB antes de importar."), true); return; }
             string archivo;
-            using (var d = new OpenFileDialog { Filter = "Archivos SQL (*.sql)|*.sql|Todos los archivos|*.*", Title = "Elige el .sql que quieres importar" })
+            using (var d = new OpenFileDialog { Filter = L.T("Archivos SQL (*.sql)|*.sql|Todos los archivos|*.*"), Title = L.T("Elige el .sql que quieres importar") })
             {
                 if (d.ShowDialog(this) != DialogResult.OK) return;
                 archivo = d.FileName;
             }
             if (Motor.TraeSuBase(archivo))
             {
-                Escribir("Este .sql ya indica sus bases de datos: se importa tal cual.");
+                Escribir(L.T("Este .sql ya indica sus bases de datos: se importa tal cual."));
                 EnSegundoPlano(() => motor.ImportarCompleto(archivo));
                 return;
             }
-            var nombre = PedirTexto("Importar .sql", "¿En qué base de datos lo meto? Si no existe, la creo.", Path.GetFileNameWithoutExtension(archivo));
+            var nombre = PedirTexto(L.T("Importar .sql"), L.T("¿En qué base de datos lo meto? Si no existe, la creo."), Path.GetFileNameWithoutExtension(archivo));
             if (string.IsNullOrWhiteSpace(nombre)) return;
             EnSegundoPlano(() => motor.Importar(archivo, nombre.Trim()));
         }
@@ -493,10 +504,10 @@ namespace Brasa
                 l.MaximumSize = new Size(390, 0);
                 l.Location = new Point(15, 14);
                 var t = new TextBox { Text = valor, Location = new Point(15, 50), Width = 390, BackColor = Tema.Tarjeta, ForeColor = Tema.Texto, BorderStyle = BorderStyle.FixedSingle, Font = Tema.Fuente(10.5f) };
-                var ok = Tema.Boton1("Importar", true);
+                var ok = Tema.Boton1(L.T("Importar"), true);
                 ok.SetBounds(215, 92, 92, 34);
                 ok.DialogResult = DialogResult.OK;
-                var no = Tema.Boton1("Cancelar");
+                var no = Tema.Boton1(L.T("Cancelar"));
                 no.SetBounds(313, 92, 92, 34);
                 no.DialogResult = DialogResult.Cancel;
                 f.Controls.AddRange(new Control[] { l, t, ok, no });
@@ -506,10 +517,32 @@ namespace Brasa
             }
         }
 
+        /// Guarda el idioma y vuelve a abrir la ventana con él (los servidores siguen como estaban)
+        void CambiarIdioma(string codigo)
+        {
+            if (operaciones > 0 || motor.Migrando)
+            {
+                L.Restaurar(cmbIdioma);
+                Escribir(L.T("Espera a que termine la operación en curso para cambiar el idioma."), true);
+                return;
+            }
+            L.Poner(codigo);
+            ajustes.PonerTexto("Idioma", L.Codigo);
+            try { ajustes.Guardar(); } catch { }
+            CambioIdioma = true;
+            saliendo = true;
+            reloj.Stop();
+            motor.Registro -= alRegistro;
+            bandeja.Visible = false;
+            bandeja.Dispose();
+            if (ventanaMigrar != null && !ventanaMigrar.IsDisposed) ventanaMigrar.Close();
+            Close();
+        }
+
         void GuardarAjuste(string k, bool v)
         {
             ajustes.PonerBool(k, v);
-            try { ajustes.Guardar(); } catch (Exception ex) { Escribir("No se pudo guardar el ajuste: " + ex.Message, true); }
+            try { ajustes.Guardar(); } catch (Exception ex) { Escribir(L.T("No se pudo guardar el ajuste: ") + ex.Message, true); }
         }
 
         // ================= Estado y vigilante =================
@@ -533,12 +566,12 @@ namespace Brasa
             if (s.Reinicios.Count >= 3)
             {
                 s.Deseado = false;
-                Escribir(s.Nombre + " se ha caído 3 veces en 5 minutos. El vigilante se rinde: mira el log.", true);
-                bandeja.ShowBalloonTip(6000, "Brasa", s.Nombre + " se cae una y otra vez. Abre Brasa para ver el motivo.", ToolTipIcon.Error);
+                Escribir(L.F("{0} se ha caído 3 veces en 5 minutos. El vigilante se rinde: mira el log.", s.Nombre), true);
+                bandeja.ShowBalloonTip(6000, "Brasa", L.F("{0} se cae una y otra vez. Abre Brasa para ver el motivo.", s.Nombre), ToolTipIcon.Error);
                 return;
             }
             s.Reinicios.Add(DateTime.Now);
-            Escribir(s.Nombre + " se ha caído. El vigilante lo vuelve a encender...", true);
+            Escribir(L.F("{0} se ha caído. El vigilante lo vuelve a encender...", s.Nombre), true);
             EnSegundoPlano(() => motor.Arrancar(s));
         }
 
@@ -549,12 +582,12 @@ namespace Brasa
 
             var a = motor.Apache.Estado; var m = motor.MariaDB.Estado;
             string texto; Color color; Icon ico;
-            if (a == Estado.Encendido && m == Estado.Encendido) { texto = "Todo encendido"; color = Tema.Verde; ico = icoVerde; }
-            else if (a == Estado.Error || m == Estado.Error) { texto = "Hay un problema"; color = Tema.Rojo; ico = icoRojo; }
+            if (a == Estado.Encendido && m == Estado.Encendido) { texto = L.T("Todo encendido"); color = Tema.Verde; ico = icoVerde; }
+            else if (a == Estado.Error || m == Estado.Error) { texto = L.T("Hay un problema"); color = Tema.Rojo; ico = icoRojo; }
             else if (operaciones > 0 || motor.Migrando || a == Estado.Arrancando || m == Estado.Arrancando || a == Estado.Parando || m == Estado.Parando)
-            { texto = motor.Migrando ? "Migrando..." : "Trabajando..."; color = Tema.Ambar; ico = icoAmbar; }
-            else if (a == Estado.Apagado && m == Estado.Apagado) { texto = "Apagado"; color = Tema.Gris; ico = icoGris; }
-            else { texto = "Encendido a medias"; color = Tema.Ambar; ico = icoAmbar; }
+            { texto = motor.Migrando ? L.T("Migrando...") : L.T("Trabajando..."); color = Tema.Ambar; ico = icoAmbar; }
+            else if (a == Estado.Apagado && m == Estado.Apagado) { texto = L.T("Apagado"); color = Tema.Gris; ico = icoGris; }
+            else { texto = L.T("Encendido a medias"); color = Tema.Ambar; ico = icoAmbar; }
 
             lblGlobal.Text = texto;
             puntoGlobal.Color = color;
@@ -579,15 +612,15 @@ namespace Brasa
             string est; Color c;
             switch (s.Estado)
             {
-                case Estado.Encendido: est = "Encendido"; c = Tema.Verde; break;
-                case Estado.Arrancando: est = "Arrancando..."; c = Tema.Ambar; break;
-                case Estado.Parando: est = "Apagando..."; c = Tema.Ambar; break;
-                case Estado.Error: est = "Error"; c = Tema.Rojo; break;
-                default: est = "Apagado"; c = Tema.Gris; break;
+                case Estado.Encendido: est = L.T("Encendido"); c = Tema.Verde; break;
+                case Estado.Arrancando: est = L.T("Arrancando..."); c = Tema.Ambar; break;
+                case Estado.Parando: est = L.T("Apagando..."); c = Tema.Ambar; break;
+                case Estado.Error: est = L.T("Error"); c = Tema.Rojo; break;
+                default: est = L.T("Apagado"); c = Tema.Gris; break;
             }
             f.Punto.Color = c;
 
-            var partes = est + "  ·  puerto " + s.Puerto;
+            var partes = est + "  ·  " + L.T("puerto") + " " + s.Puerto;
             if (s.Estado == Estado.Encendido)
             {
                 if (s.MemoriaMB > 0) partes += "  ·  " + s.MemoriaMB + " MB";
@@ -598,17 +631,17 @@ namespace Brasa
             f.Detalle.Text = s.Estado == Estado.Error ? s.Detalle : "";
 
             bool on = s.Estado == Estado.Encendido || s.Estado == Estado.Arrancando;
-            f.Accion.Text = on ? "Apagar" : "Encender";
+            f.Accion.Text = on ? L.T("Apagar") : L.T("Encender");
             f.Accion.Estilo = on ? EstiloBoton.Normal : EstiloBoton.Principal;
             f.Accion.Enabled = operaciones == 0 && !s.Ocupado && !motor.Migrando;
         }
 
         static string Duracion(TimeSpan t)
         {
-            if (t.TotalMinutes < 1) return "recién encendido";
+            if (t.TotalMinutes < 1) return L.T("recién encendido");
             if (t.TotalHours < 1) return (int)t.TotalMinutes + " min";
             if (t.TotalDays < 1) return (int)t.TotalHours + " h " + t.Minutes + " min";
-            return (int)t.TotalDays + " d " + t.Hours + " h";
+            return (int)t.TotalDays + " " + L.T("d") + " " + t.Hours + " h";
         }
 
         void Escribir(string msg, bool error = false)

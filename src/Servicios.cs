@@ -161,14 +161,14 @@ namespace Brasa
                         if (c.Length >= 5 && c[3] == "LISTENING" && c[1].EndsWith(":" + puerto))
                         {
                             int pid = int.Parse(c[4]);
-                            if (pid == 4) return "Windows (IIS / servicio web del sistema)";
+                            if (pid == 4) return L.T("Windows (IIS / servicio web del sistema)");
                             try
                             {
                                 using (var pr = Process.GetProcessById(pid))
                                 {
                                     var ruta = RutaDe(pid);
                                     string n = pr.ProcessName;
-                                    if (ruta != null && ruta.IndexOf("xampp", StringComparison.OrdinalIgnoreCase) >= 0) n += " de XAMPP";
+                                    if (ruta != null && ruta.IndexOf("xampp", StringComparison.OrdinalIgnoreCase) >= 0) n += L.T(" de XAMPP");
                                     return n + " (PID " + pid + ")" + (ruta != null ? " — " + ruta : "");
                                 }
                             }
@@ -178,7 +178,7 @@ namespace Brasa
                 }
             }
             catch { }
-            return "otro programa";
+            return L.T("otro programa");
         }
 
         /// Actualiza estado, PIDs, memoria, tiempo encendido
@@ -213,16 +213,16 @@ namespace Brasa
             try
             {
                 if (Procesos(s).Count > 0 && Escuchando(s.Puerto)) { s.Estado = Estado.Encendido; s.Deseado = true; return true; }
-                if (!File.Exists(s.Exe)) { Fallo(s, "No está instalado: falta " + s.Exe); return false; }
+                if (!File.Exists(s.Exe)) { Fallo(s, L.F("No está instalado: falta {0}", s.Exe)); return false; }
 
                 if (Escuchando(s.Puerto))
                 {
-                    Fallo(s, "El puerto " + s.Puerto + " está ocupado por " + QuienUsa(s.Puerto) + ". Ciérralo y vuelve a intentarlo.");
+                    Fallo(s, L.F("El puerto {0} está ocupado por {1}. Ciérralo y vuelve a intentarlo.", s.Puerto, QuienUsa(s.Puerto)));
                     return false;
                 }
 
                 s.Estado = Estado.Arrancando; s.Detalle = "";
-                Log("Encendiendo " + s.Nombre + "...");
+                Log(L.F("Encendiendo {0}...", s.Nombre));
 
                 var psi = new ProcessStartInfo { UseShellExecute = false, CreateNoWindow = true, WindowStyle = ProcessWindowStyle.Hidden };
                 psi.FileName = s.Exe;
@@ -241,7 +241,7 @@ namespace Brasa
 
                 Process p;
                 try { p = Process.Start(psi); }
-                catch (Exception ex) { Fallo(s, "No se pudo lanzar: " + ex.Message); return false; }
+                catch (Exception ex) { Fallo(s, L.T("No se pudo lanzar: ") + ex.Message); return false; }
 
                 var limite = DateTime.Now.AddSeconds(s == MariaDB ? 40 : 25);
                 while (DateTime.Now < limite)
@@ -254,13 +254,13 @@ namespace Brasa
                 if (Escuchando(s.Puerto) && Procesos(s).Count > 0)
                 {
                     s.Estado = Estado.Encendido; s.Deseado = true; s.Detalle = "";
-                    Log(s.Nombre + " encendido en el puerto " + s.Puerto + ".");
+                    Log(L.F("{0} encendido en el puerto {1}.", s.Nombre, s.Puerto));
                     return true;
                 }
 
-                string motivo = p.HasExited ? "se ha cerrado nada más arrancar (código " + p.ExitCode + ")" : "no responde en el puerto " + s.Puerto;
+                string motivo = p.HasExited ? L.F("{0} se ha cerrado nada más arrancar (código {1}).", s.Nombre, p.ExitCode) : L.F("{0} no responde en el puerto {1}.", s.Nombre, s.Puerto);
                 if (!p.HasExited) MatarProcesos(s);
-                Fallo(s, s.Nombre + " " + motivo + ".");
+                Fallo(s, motivo);
                 foreach (var l in UltimasLineas(s, 8)) Log("   " + l, true);
                 return false;
             }
@@ -316,7 +316,7 @@ namespace Brasa
             {
                 if (Procesos(s).Count == 0) { s.Estado = Estado.Apagado; s.Detalle = ""; return; }
                 s.Estado = Estado.Parando;
-                Log("Apagando " + s.Nombre + "...");
+                Log(L.F("Apagando {0}...", s.Nombre));
 
                 if (s == MariaDB)
                 {
@@ -330,14 +330,14 @@ namespace Brasa
                     }
                     if (Procesos(s).Count > 0)
                     {
-                        Log("MariaDB no respondió al apagado normal (¿root tiene contraseña?). Forzando cierre.", true);
+                        Log(L.T("MariaDB no respondió al apagado normal (¿root tiene contraseña?). Forzando cierre."), true);
                         MatarProcesos(s);
                     }
                 }
                 else MatarProcesos(s);
 
                 s.Estado = Estado.Apagado; s.Detalle = "";
-                Log(s.Nombre + " apagado.");
+                Log(L.F("{0} apagado.", s.Nombre));
             }
             finally { s.Ocupado = false; }
         }
@@ -378,25 +378,25 @@ namespace Brasa
         /// Copia de seguridad de todas las bases de datos. Devuelve la ruta o null.
         public string CopiaSeguridad(string motivo)
         {
-            if (MariaDB.Estado != Estado.Encendido) { Log("Para hacer una copia, MariaDB tiene que estar encendido.", true); return null; }
+            if (MariaDB.Estado != Estado.Encendido) { Log(L.T("Para hacer una copia, MariaDB tiene que estar encendido."), true); return null; }
             var dump = Herramienta("mariadb-dump.exe", "mysqldump.exe");
-            if (dump == null) { Log("No encuentro mariadb-dump.exe.", true); return null; }
+            if (dump == null) { Log(L.F("No encuentro {0}.", "mariadb-dump.exe"), true); return null; }
             Directory.CreateDirectory(DirBackups);
             var archivo = Path.Combine(DirBackups, "copia-" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".sql");
-            Log("Haciendo copia de seguridad" + (motivo != null ? " (" + motivo + ")" : "") + "...");
+            Log(L.T("Haciendo copia de seguridad") + (motivo != null ? " (" + motivo + ")" : "") + "...");
             var err = Ejecutar(dump, "-u root --host=127.0.0.1 --port=" + MariaDB.Puerto +
                 " --all-databases --routines --events --triggers --single-transaction --default-character-set=utf8mb4" +
                 " --result-file=\"" + archivo + "\"", 15 * 60 * 1000);
             if (err.Length > 0 || !File.Exists(archivo))
             {
-                Log("La copia ha fallado: " + err, true);
+                Log(L.T("La copia ha fallado: ") + err, true);
                 try { File.Delete(archivo); } catch { }
                 return null;
             }
             // conservar solo las 15 más recientes
             foreach (var viejo in new DirectoryInfo(DirBackups).GetFiles("copia-*.sql").OrderByDescending(f => f.Name).Skip(15))
                 try { viejo.Delete(); } catch { }
-            Log("Copia guardada: " + Path.GetFileName(archivo) + " (" + (new FileInfo(archivo).Length / 1024) + " KB)");
+            Log(L.T("Copia guardada: ") + Path.GetFileName(archivo) + " (" + (new FileInfo(archivo).Length / 1024) + " KB)");
             return archivo;
         }
 
@@ -409,14 +409,14 @@ namespace Brasa
         /// Importa un .sql que ya trae sus CREATE DATABASE / USE (copias completas, migración)
         public bool ImportarCompleto(string archivo)
         {
-            if (MariaDB.Estado != Estado.Encendido) { Log("Para importar, MariaDB tiene que estar encendido.", true); return false; }
+            if (MariaDB.Estado != Estado.Encendido) { Log(L.T("Para importar, MariaDB tiene que estar encendido."), true); return false; }
             var cli = Herramienta("mariadb.exe", "mysql.exe");
-            if (cli == null) { Log("No encuentro mariadb.exe.", true); return false; }
-            Log("Importando " + Path.GetFileName(archivo) + " en Brasa... (puede tardar)");
+            if (cli == null) { Log(L.F("No encuentro {0}.", "mariadb.exe"), true); return false; }
+            Log(L.F("Importando {0} en Brasa... (puede tardar)", Path.GetFileName(archivo)));
             var err = Ejecutar(cli, "-u root --host=127.0.0.1 --port=" + MariaDB.Puerto + " --default-character-set=utf8mb4", 60 * 60 * 1000,
                 "SOURCE " + archivo.Replace('\\', '/') + "\n");
-            if (err.Length > 0) { Log("Error al importar: " + err, true); return false; }
-            Log("Bases de datos importadas en Brasa.");
+            if (err.Length > 0) { Log(L.T("Error al importar: ") + err, true); return false; }
+            Log(L.T("Bases de datos importadas en Brasa."));
             return true;
         }
 
@@ -439,17 +439,17 @@ namespace Brasa
         /// Importa un .sql en la base indicada (la crea si no existe)
         public bool Importar(string archivo, string baseDatos)
         {
-            if (MariaDB.Estado != Estado.Encendido) { Log("Para importar, MariaDB tiene que estar encendido.", true); return false; }
+            if (MariaDB.Estado != Estado.Encendido) { Log(L.T("Para importar, MariaDB tiene que estar encendido."), true); return false; }
             var cli = Herramienta("mariadb.exe", "mysql.exe");
-            if (cli == null) { Log("No encuentro mariadb.exe.", true); return false; }
+            if (cli == null) { Log(L.F("No encuentro {0}.", "mariadb.exe"), true); return false; }
             var nombre = baseDatos.Replace("`", "``");
-            Log("Importando " + Path.GetFileName(archivo) + " en '" + baseDatos + "'... (puede tardar)");
+            Log(L.F("Importando {0} en '{1}'... (puede tardar)", Path.GetFileName(archivo), baseDatos));
             var sql = "CREATE DATABASE IF NOT EXISTS `" + nombre + "` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;\n" +
                       "USE `" + nombre + "`;\n" +
                       "SOURCE " + archivo.Replace('\\', '/') + "\n";
             var err = Ejecutar(cli, "-u root --host=127.0.0.1 --port=" + MariaDB.Puerto + " --default-character-set=utf8mb4", 60 * 60 * 1000, sql);
-            if (err.Length > 0) { Log("Error al importar: " + err, true); return false; }
-            Log("Importación terminada en '" + baseDatos + "'.");
+            if (err.Length > 0) { Log(L.T("Error al importar: ") + err, true); return false; }
+            Log(L.F("Importación terminada en '{0}'.", baseDatos));
             return true;
         }
     }

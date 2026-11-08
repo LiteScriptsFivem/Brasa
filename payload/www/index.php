@@ -14,9 +14,34 @@ try {
 }
 $proyectos = array_filter(glob(__DIR__ . '/*'), 'is_dir');
 $e = fn($s) => htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
+
+// Idioma: el primero del navegador que tengamos (es, en, fr, de); si no, inglés
+$textos = [
+    'es' => ['ok' => 'Brasa está funcionando', 'sub' => 'Tus archivos van en la carpeta', 'nodb' => 'Sin conexión', 'tools' => 'Herramientas',
+             'proj' => 'Proyectos en www', 'noproj' => 'Todavía no hay ninguna carpeta. Crea una dentro de <code>www</code> y aparecerá aquí.',
+             'dbs' => 'Bases de datos', 'nodbs' => 'No hay bases de datos todavía.', 'free' => 'gratis', 'by' => 'por'],
+    'en' => ['ok' => 'Brasa is running', 'sub' => 'Your files go in the folder', 'nodb' => 'No connection', 'tools' => 'Tools',
+             'proj' => 'Projects in www', 'noproj' => 'There are no folders yet. Create one inside <code>www</code> and it will show up here.',
+             'dbs' => 'Databases', 'nodbs' => 'There are no databases yet.', 'free' => 'free', 'by' => 'by'],
+    'fr' => ['ok' => 'Brasa fonctionne', 'sub' => 'Vos fichiers vont dans le dossier', 'nodb' => 'Pas de connexion', 'tools' => 'Outils',
+             'proj' => 'Projets dans www', 'noproj' => 'Aucun dossier pour l\'instant. Créez-en un dans <code>www</code> et il apparaîtra ici.',
+             'dbs' => 'Bases de données', 'nodbs' => 'Aucune base de données pour l\'instant.', 'free' => 'gratuit', 'by' => 'par'],
+    'de' => ['ok' => 'Brasa läuft', 'sub' => 'Deine Dateien kommen in den Ordner', 'nodb' => 'Keine Verbindung', 'tools' => 'Werkzeuge',
+             'proj' => 'Projekte in www', 'noproj' => 'Noch keine Ordner. Lege einen in <code>www</code> an, dann erscheint er hier.',
+             'dbs' => 'Datenbanken', 'nodbs' => 'Noch keine Datenbanken.', 'free' => 'kostenlos', 'by' => 'von'],
+];
+$lang = 'en';
+$pedidos = [];
+foreach (explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '') as $i => $parte) {
+    if (preg_match('/^\s*([a-z]{2})\b[^;]*(?:;\s*q=([\d.]+))?/i', $parte, $m))
+        $pedidos[] = [strtolower($m[1]), isset($m[2]) ? (float)$m[2] : 1.0, $i];
+}
+usort($pedidos, fn($a, $b) => [$b[1], $a[2]] <=> [$a[1], $b[2]]);
+foreach ($pedidos as $p) if (isset($textos[$p[0]])) { $lang = $p[0]; break; }
+$t = $textos[$lang];
 ?>
 <!doctype html>
-<html lang="es">
+<html lang="<?= $lang ?>">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -46,28 +71,28 @@ $e = fn($s) => htmlspecialchars((string)$s, ENT_QUOTES, 'UTF-8');
 <div class="wrap">
   <header>
     <div class="logo"></div>
-    <div><h1>Brasa está funcionando</h1><div class="sub">Tus archivos van en la carpeta <code>www</code></div></div>
+    <div><h1><?= $t['ok'] ?></h1><div class="sub"><?= $t['sub'] ?> <code>www</code></div></div>
   </header>
 
   <div class="grid">
     <div class="card"><b>PHP</b><span class="ok">● <?= $e(PHP_VERSION) ?></span></div>
     <div class="card"><b>MariaDB</b>
       <?php if ($dbOk): ?><span class="ok">● <?= $e($dbInfo) ?></span>
-      <?php else: ?><span class="bad">● Sin conexión</span><?php endif; ?>
+      <?php else: ?><span class="bad">● <?= $t['nodb'] ?></span><?php endif; ?>
     </div>
-    <div class="card"><b>Herramientas</b><a href="/phpmyadmin" style="color:var(--acc)">phpMyAdmin</a> · <a href="?info" style="color:var(--acc)">phpinfo()</a></div>
+    <div class="card"><b><?= $t['tools'] ?></b><a href="/phpmyadmin" style="color:var(--acc)">phpMyAdmin</a> · <a href="?info" style="color:var(--acc)">phpinfo()</a></div>
   </div>
 
-  <h2>Proyectos en www</h2>
+  <h2><?= $t['proj'] ?></h2>
   <?php if ($proyectos): ?>
     <ul><?php foreach ($proyectos as $p): $n = basename($p); ?><li><a href="/<?= rawurlencode($n) ?>/"><?= $e($n) ?></a></li><?php endforeach; ?></ul>
-  <?php else: ?><p class="vacio">Todavía no hay ninguna carpeta. Crea una dentro de <code>www</code> y aparecerá aquí.</p><?php endif; ?>
+  <?php else: ?><p class="vacio"><?= $t['noproj'] ?></p><?php endif; ?>
 
-  <h2>Bases de datos</h2>
+  <h2><?= $t['dbs'] ?></h2>
   <?php if ($dbs): ?>
     <ul><?php foreach ($dbs as $d): ?><li><a href="/phpmyadmin/index.php?route=/database/structure&db=<?= rawurlencode($d) ?>"><?= $e($d) ?></a></li><?php endforeach; ?></ul>
-  <?php else: ?><p class="vacio">No hay bases de datos todavía.</p><?php endif; ?>
-  <footer>Brasa · gratis · por <a href="https://lite-scripts.com/">LiteScripts</a> · <a href="https://discord.gg/ffSndEucDF">Discord</a></footer>
+  <?php else: ?><p class="vacio"><?= $t['nodbs'] ?></p><?php endif; ?>
+  <footer>Brasa · <?= $t['free'] ?> · <?= $t['by'] ?> <a href="https://lite-scripts.com/">LiteScripts</a> · <a href="https://discord.gg/ffSndEucDF">Discord</a></footer>
 </div>
 </body>
 </html>

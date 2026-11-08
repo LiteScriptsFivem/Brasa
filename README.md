@@ -16,6 +16,8 @@
   <a href="https://lite-scripts.com/">Tienda</a>
 </p>
 
+<p align="center"><b>Español</b> · <a href="README.en.md">English</a></p>
+
 <p align="center"><img src="docs/panel.png" width="760" alt="Panel de Brasa"></p>
 
 ## Qué hace
@@ -28,6 +30,7 @@
 - **Importar .sql** sin límite de tamaño.
 - **Migrar desde XAMPP:** pasa tus bases de datos y proyectos de `htdocs` a Brasa.
 - **Puertos ocupados:** te dice qué programa está usando el puerto.
+- **Idiomas:** español, inglés, francés y alemán. Sigue el idioma de Windows y se puede cambiar desde el instalador o el panel.
 - Arranque con Windows, acceso en el menú Inicio y desinstalador en *Aplicaciones instaladas*.
 
 ## Instalación
@@ -56,10 +59,14 @@ sudo apt install mono-devel        # o mono-complete
 
 Para regenerar los iconos: `python3 tools/iconos.py res` (necesita Pillow).
 
+### Traducciones
+
+Los textos de la interfaz están escritos en español en el código y envueltos en `L.T("...")` (o `L.F("... {0}", x)` si llevan datos). Sus versiones en inglés, francés y alemán están en `src/Textos.cs`; si falta alguna, se muestra el texto en español. Los términos están en `src/Terminos.cs`, los mensajes del script de instalación en `payload/scripts/config.ps1` y los de la página de inicio en `payload/www/index.php`. El idioma elegido se guarda como `Idioma=` en `brasa.ini`.
+
 ## Estructura
 
 ```
-src/        Código C# (panel, instalador, migración, servicios)
+src/        Código C# (panel, instalador, migración, servicios, traducciones)
 payload/    Script que descarga y configura los componentes + página de inicio
 res/        Iconos y logos
 tools/      Generador de iconos
