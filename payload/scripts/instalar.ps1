@@ -39,51 +39,50 @@ function ExtraerCarpeta($zip, $final, $patronCarpeta) {
     $tmp = Join-Path $DirTmp ('x_' + [IO.Path]::GetRandomFileName())
     Extraer $zip $tmp
     $dentro = Get-ChildItem $tmp -Directory | Where-Object { $_.Name -like $patronCarpeta } | Select-Object -First 1
-    if (-not $dentro) { throw "El zip $zip no tiene la carpeta esperada ($patronCarpeta)." }
+    if (-not $dentro) { throw ((T 'zip.sin') -f $zip, $patronCarpeta) }
     Move-Item $dentro.FullName $final
     Remove-Item $tmp -Recurse -Force
 }
 
 try {
     Write-Host '=============================================' -ForegroundColor Cyan
-    Write-Host ' Brasa - instalando componentes' -ForegroundColor Cyan
+    Write-Host (T 'cabecera') -ForegroundColor Cyan
     Write-Host ' Apache + PHP + MariaDB + phpMyAdmin' -ForegroundColor Cyan
     Write-Host '=============================================' -ForegroundColor Cyan
-    Write-Host " Carpeta: $Base"
+    Write-Host ((T 'carpeta') -f $Base)
 
     if ($Base -match '[^\x00-\x7F]') {
-        Aviso 'La ruta tiene tildes, enes u otros caracteres raros. Apache puede fallar.'
-        Aviso 'Recomendado: mueve la carpeta a C:\servidor y ejecuta instalar.bat desde ahi.'
-        Aviso 'Continuando igualmente...'
+        Aviso (T 'ruta.rara')
+        Aviso (T 'ruta.consejo')
+        Aviso (T 'continuando')
     }
 
     if ($Base -match '\\AppData\\Local\\Temp\\' -or $Base -match '\.zip') {
-        Fallo 'Lo estas ejecutando DENTRO del zip. Asi no funciona.'
-        Aviso 'Clic derecho en el zip -> "Extraer todo..." -> elige C:\'
-        Aviso 'Luego abre C:\servidor y haz doble clic en instalar.bat'
+        Fallo (T 'zip.dentro')
+        Aviso (T 'zip.consejo')
         exit 1
     }
 
     New-Item -ItemType Directory -Force -Path $DirTmp, $DirDesc, $DirWww, (Join-Path $DirTmp 'pma') | Out-Null
 
     # ---------- 1. Visual C++ (lo necesitan Apache y PHP) ----------
-    Paso 'Comprobando Visual C++ Redistributable'
+    Paso (T 'paso.vc')
     $vc = Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64' -ErrorAction SilentlyContinue
     if ($vc -and $vc.Installed -eq 1 -and $vc.Minor -ge 40) {
-        Ok "Ya instalado ($($vc.Version))"
+        Ok ((T 'ya.instalado') -f $vc.Version)
     } else {
         $vcExe = Join-Path $DirDesc 'vc_redist.x64.exe'
-        if (-not (Descargar 'https://aka.ms/vs/17/release/vc_redist.x64.exe' $vcExe $null)) { throw 'No se pudo descargar Visual C++.' }
-        Aviso 'Instalando... (Windows te pedira permiso, pulsa Si)'
+        if (-not (Descargar 'https://aka.ms/vs/17/release/vc_redist.x64.exe' $vcExe $null)) { throw (T 'vc.descarga') }
+        Aviso (T 'vc.instalando')
         $p = Start-Process $vcExe -ArgumentList '/install', '/passive', '/norestart' -Wait -PassThru
-        if ($p.ExitCode -notin 0, 1638, 3010) { throw "Visual C++ fallo (codigo $($p.ExitCode))." }
-        Ok 'Instalado'
+        if ($p.ExitCode -notin 0, 1638, 3010) { throw ((T 'vc.fallo') -f $p.ExitCode) }
+        Ok (T 'instalado')
     }
 
     # ---------- 2. Apache ----------
     Paso 'Apache'
     if (Test-Path "$DirApache\bin\httpd.exe") {
-        Ok 'Ya estaba descargado'
+        Ok (T 'ya.descargado')
     } else {
         $nombre = $null
         try {
@@ -97,12 +96,12 @@ try {
         $zip = Join-Path $DirDesc 'apache.zip'
         $ok = $false
         foreach ($n in ($candidatos | Select-Object -Unique)) {
-            Aviso "Descargando $n"
+            Aviso ((T 'descargando') -f $n)
             if (Descargar "https://www.apachelounge.com/download/VS17/binaries/$n" $zip 'https://www.apachelounge.com/download/') { $ok = $true; break }
         }
-        if (-not $ok) { throw 'No se pudo descargar Apache. Bajalo a mano de apachelounge.com (win64 VS17) y descomprime la carpeta Apache24 aqui con el nombre "apache".' }
+        if (-not $ok) { throw (T 'apache.fallo') }
         ExtraerCarpeta $zip $DirApache 'Apache24*'
-        Ok 'Descargado'
+        Ok (T 'descargado')
     }
     New-Item -ItemType Directory -Force -Path "$DirApache\logs", (Join-Path $Base 'backups') | Out-Null
     $confOrig = "$DirApache\conf\httpd.conf.original"
@@ -111,7 +110,7 @@ try {
     # ---------- 3. PHP ----------
     Paso "PHP $PhpRama"
     if (Test-Path "$DirPhp\php8apache2_4.dll") {
-        Ok 'Ya estaba descargado'
+        Ok (T 'ya.descargado')
     } else {
         $patron = 'php-' + [regex]::Escape($PhpRama) + '\.(\d+)-Win32-(vs1[67])-x64\.zip'
         $fuentes = @(
@@ -124,22 +123,22 @@ try {
         $zip = Join-Path $DirDesc 'php.zip'
         $ok = $false
         foreach ($f in $fuentes) {
-            try { $html = LeerPagina $f } catch { Aviso "No responde: $f"; continue }
+            try { $html = LeerPagina $f } catch { Aviso ((T 'no.responde') -f $f); continue }
             $m = [regex]::Matches($html, $patron) | Sort-Object { [int]$_.Groups[1].Value } -Descending | Select-Object -First 1
             if (-not $m) { continue }
             $n = $m.Value
-            Aviso "Descargando $n"
+            Aviso ((T 'descargando') -f $n)
             if (Descargar ($f + $n) $zip $null) { $ok = $true; break }
         }
-        if (-not $ok) { throw "No se pudo descargar PHP $PhpRama. Bajalo a mano (version Thread Safe x64 zip) y descomprimelo en la carpeta php." }
+        if (-not $ok) { throw ((T 'php.fallo') -f $PhpRama) }
         Extraer $zip $DirPhp
-        Ok 'Descargado'
+        Ok (T 'descargado')
     }
 
     # ---------- 4. MariaDB ----------
     Paso "MariaDB $MariaRama"
     if (Test-Path "$DirMaria\bin\mariadbd.exe") {
-        Ok 'Ya estaba descargado'
+        Ok (T 'ya.descargado')
     } else {
         $versiones = @()
         try {
@@ -152,7 +151,7 @@ try {
         $zip = Join-Path $DirDesc 'mariadb.zip'
         $ok = $false
         foreach ($v in ($candidatos | Select-Object -Unique)) {
-            Aviso "Descargando MariaDB $v (unos 100 MB, paciencia)"
+            Aviso ((T 'maria.descargando') -f $v)
             $urls = @(
                 "https://archive.mariadb.org/mariadb-$v/winx64-packages/mariadb-$v-winx64.zip",
                 "https://downloads.mariadb.org/rest-api/mariadb/$v/mariadb-$v-winx64.zip",
@@ -160,29 +159,29 @@ try {
                 "https://ftp.nluug.nl/db/mariadb/mariadb-$v/winx64-packages/mariadb-$v-winx64.zip"
             )
             foreach ($u in $urls) {
-                Aviso "  desde $(([uri]$u).Host)"
+                Aviso ((T 'desde') -f ([uri]$u).Host)
                 if (Descargar $u $zip $null) { $ok = $true; break }
             }
             if ($ok) { break }
         }
-        if (-not $ok) { throw 'No se pudo descargar MariaDB.' }
+        if (-not $ok) { throw (T 'maria.fallo') }
         ExtraerCarpeta $zip $DirMaria 'mariadb-*'
-        Ok 'Descargado'
+        Ok (T 'descargado')
     }
 
     # ---------- 5. phpMyAdmin ----------
     Paso 'phpMyAdmin'
     if (Test-Path "$DirPma\index.php") {
-        Ok 'Ya estaba descargado'
+        Ok (T 'ya.descargado')
     } else {
         $zip = Join-Path $DirDesc 'pma.zip'
-        if (-not (Descargar 'https://www.phpmyadmin.net/downloads/phpMyAdmin-latest-all-languages.zip' $zip $null)) { throw 'No se pudo descargar phpMyAdmin.' }
+        if (-not (Descargar 'https://www.phpmyadmin.net/downloads/phpMyAdmin-latest-all-languages.zip' $zip $null)) { throw (T 'pma.fallo') }
         ExtraerCarpeta $zip $DirPma 'phpMyAdmin-*'
-        Ok 'Descargado'
+        Ok (T 'descargado')
     }
 
     # ---------- 6. Configurar Apache ----------
-    Paso 'Configurando Apache'
+    Paso (T 'paso.apache')
     $apF  = $DirApache -replace '\\', '/'
     $phpF = $DirPhp    -replace '\\', '/'
     $wwwF = $DirWww    -replace '\\', '/'
@@ -223,10 +222,10 @@ Alias /phpmyadmin "@PMA@"
 '@
     $conf += $extra.Replace('@PHP@', $phpF).Replace('@WWW@', $wwwF).Replace('@PMA@', $pmaF)
     Escribir "$DirApache\conf\httpd.conf" $conf
-    Ok 'Hecho'
+    Ok (T 'hecho')
 
     # ---------- 7. Configurar PHP ----------
-    Paso 'Configurando PHP'
+    Paso (T 'paso.php')
     $ini = Get-Content -Raw "$DirPhp\php.ini-development"
     $ini = $ini -replace '(?m)^;\s*extension_dir\s*=\s*"ext"\s*$', ('extension_dir = "' + $phpF + '/ext"')
     foreach ($e in 'mysqli', 'pdo_mysql', 'mbstring', 'openssl', 'curl', 'gd', 'intl', 'zip', 'fileinfo', 'exif', 'sodium') {
@@ -236,19 +235,19 @@ Alias /phpmyadmin "@PMA@"
     $ini = $ini -replace '(?m)^upload_max_filesize\s*=.*$', 'upload_max_filesize = 128M'
     $ini = $ini -replace '(?m)^post_max_size\s*=.*$', 'post_max_size = 128M'
     Escribir "$DirPhp\php.ini" $ini
-    Ok 'Hecho'
+    Ok (T 'hecho')
 
     # ---------- 8. Base de datos ----------
-    Paso 'Preparando la base de datos'
+    Paso (T 'paso.db')
     $myIni = Join-Path $DirDatos 'my.ini'
     if (Test-Path $myIni) {
-        Ok 'Ya existia (tus datos se conservan)'
+        Ok (T 'db.existe')
     } else {
-        if (Test-Path $DirDatos) { throw "La carpeta 'datos' existe pero esta incompleta. Si no tiene nada importante, borrala y vuelve a ejecutar instalar.bat." }
+        if (Test-Path $DirDatos) { throw (T 'db.incompleta') }
         $installDb = @('mariadb-install-db.exe', 'mysql_install_db.exe') | ForEach-Object { Join-Path "$DirMaria\bin" $_ } | Where-Object { Test-Path $_ } | Select-Object -First 1
         & $installDb "--datadir=$DirDatos" "--port=$PuertoDB"
-        if ($LASTEXITCODE -ne 0 -or -not (Test-Path $myIni)) { throw 'No se pudo crear la base de datos.' }
-        Ok 'Creada (usuario root, sin contrasena, como XAMPP)'
+        if ($LASTEXITCODE -ne 0 -or -not (Test-Path $myIni)) { throw (T 'db.fallo') }
+        Ok (T 'db.creada')
     }
     $my = Get-Content -Raw $myIni
     $my = $my -replace '(?m)^port\s*=\s*\d+', "port=$PuertoDB"
@@ -275,25 +274,25 @@ $cfg['TempDir'] = '@TMP@';
     Escribir "$DirPma\config.inc.php" $pmaConf.Replace('@SECRET@', $secreto).Replace('@PORT@', "$PuertoDB").Replace('@TMP@', ((Join-Path $DirTmp 'pma') -replace '\\', '/'))
 
     # ---------- 10. Comprobacion ----------
-    Paso 'Comprobando la configuracion de Apache'
+    Paso (T 'paso.check')
     $env:PATH = "$DirPhp;$env:PATH"
     & "$DirApache\bin\httpd.exe" -t
     if ($LASTEXITCODE -ne 0) {
-        Aviso "Carpeta apache existe: $(Test-Path $DirApache)"
+        Aviso ((T 'apache.dir') -f (Test-Path $DirApache))
         Get-Content "$DirApache\conf\httpd.conf" | Select-String -Pattern '^(ServerRoot|DocumentRoot|Listen|LoadModule php|PHPIniDir)' | ForEach-Object { Aviso $_.Line }
-        throw 'La configuracion de Apache tiene un error (mira el mensaje de arriba).' }
+        throw (T 'apache.conf') }
 
     Remove-Item $DirDesc -Recurse -Force -ErrorAction SilentlyContinue
 
     Write-Host ''
     Write-Host '=============================================' -ForegroundColor Green
-    Write-Host ' Componentes instalados' -ForegroundColor Green
+    Write-Host (T 'fin') -ForegroundColor Green
     Write-Host '=============================================' -ForegroundColor Green
     exit 0
 }
 catch {
     Write-Host ''
     Fallo "ERROR: $($_.Exception.Message)"
-    Fallo 'Pulsa 'Copiar registro' y pasaselo a Claude.'
+    Fallo (T 'copiar')
     exit 1
 }

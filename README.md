@@ -6,7 +6,7 @@
 
 <p align="center">
   Servidor local para Windows: <b>Apache + PHP 8.4 + MariaDB + phpMyAdmin</b><br>
-  con panel, icono junto al reloj, vigilante y copias de seguridad automáticas.<br>
+  con panel, icono en la esquina inferior derecha de la pantalla, vigilante y copias de seguridad automáticas.<br>
   Gratis · por <a href="https://lite-scripts.com/">LiteScripts</a> · desarrollado por hotbambi
 </p>
 
@@ -16,18 +16,21 @@
   <a href="https://lite-scripts.com/">Tienda</a>
 </p>
 
+<p align="center"><b>Español</b> · <a href="README.en.md">English</a></p>
+
 <p align="center"><img src="docs/panel.png" width="760" alt="Panel de Brasa"></p>
 
 ## Qué hace
 
 - **Instalador en un clic.** Descarga Apache, PHP, MariaDB y phpMyAdmin de sus webs oficiales y lo configura todo.
-- **Panel y bandeja.** Enciende, apaga y mira el estado de cada servicio. Al cerrar con la X sigue funcionando junto al reloj, con un icono que cambia de color según el estado.
+- **Panel y bandeja.** Enciende, apaga y mira el estado de cada servicio. Al cerrar con la X sigue funcionando en la esquina inferior derecha de la pantalla (flecha ^), con un icono que cambia de color según el estado.
 - **Vigilante.** Si Apache o MariaDB se caen, los vuelve a encender.
 - **Apagado limpio de MariaDB**, también al apagar Windows, para que no se corrompan las tablas.
 - **Copias de seguridad** diarias automáticas y manuales (guarda las 15 últimas).
 - **Importar .sql** sin límite de tamaño.
 - **Migrar desde XAMPP:** pasa tus bases de datos y proyectos de `htdocs` a Brasa.
 - **Puertos ocupados:** te dice qué programa está usando el puerto.
+- **Idiomas:** español, inglés, francés y alemán. Sigue el idioma de Windows y se puede cambiar desde el instalador o el panel.
 - Arranque con Windows, acceso en el menú Inicio y desinstalador en *Aplicaciones instaladas*.
 
 ## Instalación
@@ -47,19 +50,33 @@ Requisitos: Windows 10 u 11 de 64 bits (incluye .NET Framework 4.8) y conexión 
 
 ## Compilar desde el código
 
-Se compila con Mono contra las bibliotecas de .NET Framework 4.7.2, así que funciona en cualquier Windows 10/11 sin instalar nada:
+El programa usa .NET Framework 4.x, que ya viene con Windows 10/11, así que funciona sin instalar nada. Las dos formas de compilar generan `build/Brasa.exe` y `build/Brasa-Instalador.exe`.
+
+**En Windows** (usa el `csc.exe` que trae Windows, no hace falta instalar nada):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File build.ps1
+```
+
+**En Linux** (con Mono):
 
 ```bash
 sudo apt install mono-devel        # o mono-complete
-./build.sh                          # genera build/Brasa.exe y build/Brasa-Instalador.exe
+./build.sh
 ```
 
+Para probar el panel, instálalo con `Brasa-Instalador.exe`. El `build/Brasa.exe` suelto busca Apache y MariaDB en su misma carpeta y avisará de que no está instalado.
+
 Para regenerar los iconos: `python3 tools/iconos.py res` (necesita Pillow).
+
+### Traducciones
+
+Los textos de la interfaz están escritos en español en el código y envueltos en `L.T("...")` (o `L.F("... {0}", x)` si llevan datos). Sus versiones en inglés, francés y alemán están en `src/Textos.cs`; si falta alguna, se muestra el texto en español. Los términos están en `src/Terminos.cs`, los mensajes del script de instalación en `payload/scripts/config.ps1` y los de la página de inicio en `payload/www/index.php`. El idioma elegido se guarda como `Idioma=` en `brasa.ini`.
 
 ## Estructura
 
 ```
-src/        Código C# (panel, instalador, migración, servicios)
+src/        Código C# (panel, instalador, migración, servicios, traducciones)
 payload/    Script que descarga y configura los componentes + página de inicio
 res/        Iconos y logos
 tools/      Generador de iconos

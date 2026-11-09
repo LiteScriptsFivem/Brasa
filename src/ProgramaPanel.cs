@@ -24,6 +24,8 @@ namespace Brasa
             string exe = Application.ExecutablePath;
             string baseDir = Path.GetDirectoryName(exe);
 
+            var ajustes = new Ajustes(Path.Combine(baseDir, "brasa.ini"));
+            L.Cargar(ajustes);
             if (args.Contains("--desinstalar")) return Desinstalar(exe, baseDir);
 
             bool nuevo;
@@ -36,10 +38,9 @@ namespace Brasa
                     return 0;
                 }
 
-                var ajustes = new Ajustes(Path.Combine(baseDir, "brasa.ini"));
                 if (!VentanaAceptar.Comprobar(ajustes)) return 0;   // sin aceptar los términos no se usa
                 var motor = new Motor(baseDir);
-                var panel = new Ventana(motor, ajustes, exe, args.Contains("--minimizado"));
+                Ventana panel = null;
 
                 var mostrar = new EventWaitHandle(false, EventResetMode.AutoReset, EventoMostrar);
                 var salir = new EventWaitHandle(false, EventResetMode.AutoReset, EventoSalir);
@@ -49,13 +50,22 @@ namespace Brasa
                     while (true)
                     {
                         int i = WaitHandle.WaitAny(hs);
-                        if (i == 0) panel.MostrarDesdeFuera();
-                        else { panel.SalirDesdeFuera(); return; }
+                        var p = panel;
+                        if (p == null) continue;
+                        if (i == 0) p.MostrarDesdeFuera();
+                        else { p.SalirDesdeFuera(); return; }
                     }
                 }) { IsBackground = true };
                 hilo.Start();
 
-                Application.Run(panel);
+                // cambiar de idioma cierra la ventana y abre otra nueva con los textos traducidos
+                bool minimizado = args.Contains("--minimizado"), reabierta = false;
+                do
+                {
+                    panel = new Ventana(motor, ajustes, exe, minimizado, reabierta);
+                    Application.Run(panel);
+                    minimizado = false; reabierta = true;
+                } while (panel.CambioIdioma);
                 GC.KeepAlive(mutex);
             }
             return 0;
@@ -63,13 +73,13 @@ namespace Brasa
 
         static int Desinstalar(string exe, string baseDir)
         {
-            var r = MessageBox.Show("¿Quieres desinstalar Brasa?", "Desinstalar Brasa", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            var r = MessageBox.Show(L.T("¿Quieres desinstalar Brasa?"), L.T("Desinstalar Brasa"), MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (r != DialogResult.Yes) return 1;
 
             var conservar = MessageBox.Show(
-                "¿Conservar tus bases de datos, la carpeta www y las copias de seguridad?\n\n" +
-                "Sí: se quedan en " + baseDir + "\nNo: se borra TODO",
-                "Desinstalar Brasa", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
+                L.T("¿Conservar tus bases de datos, la carpeta www y las copias de seguridad?") + "\n\n" +
+                L.F("Sí: se quedan en {0}\nNo: se borra TODO", baseDir),
+                L.T("Desinstalar Brasa"), MessageBoxButtons.YesNoCancel, MessageBoxIcon.Warning);
             if (conservar == DialogResult.Cancel) return 1;
 
             // 1. cerrar el panel si está abierto (apaga los servidores de forma limpia)
@@ -112,8 +122,8 @@ namespace Brasa
             });
 
             MessageBox.Show(conservar == DialogResult.Yes
-                ? "Brasa desinstalado. Tus datos siguen en:\n" + baseDir
-                : "Brasa desinstalado por completo.", "Brasa", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ? L.T("Brasa desinstalado. Tus datos siguen en:") + "\n" + baseDir
+                : L.T("Brasa desinstalado por completo."), "Brasa", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return 0;
         }
     }

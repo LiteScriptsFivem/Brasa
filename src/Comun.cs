@@ -192,7 +192,7 @@ namespace Brasa
         {
             using (var s = Flujo(nombre))
             {
-                if (s == null) throw new Exception("Falta el recurso interno " + nombre);
+                if (s == null) throw new Exception(L.T("Falta el recurso interno ") + nombre);
                 Directory.CreateDirectory(Path.GetDirectoryName(destino));
                 using (var f = File.Create(destino)) s.CopyTo(f);
             }
@@ -265,7 +265,7 @@ namespace Brasa
         {
             using (var k = Registry.CurrentUser.CreateSubKey(ClaveDesinstalar))
             {
-                k.SetValue("DisplayName", "Brasa - Servidor local");
+                k.SetValue("DisplayName", L.T("Brasa - Servidor local"));
                 k.SetValue("DisplayIcon", exe + ",0");
                 k.SetValue("DisplayVersion", version);
                 k.SetValue("Publisher", "LiteScripts");

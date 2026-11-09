@@ -1,0 +1,226 @@
+namespace Brasa
+{
+    /// Traducciones: E(español, inglés, francés, alemán)
+    static partial class L
+    {
+        static void Cargar()
+        {
+            // ---------- Comunes ----------
+            E("Falta el recurso interno ", "Missing internal resource ", "Ressource interne manquante ", "Interne Ressource fehlt ");
+            E("Brasa - Servidor local", "Brasa - Local server", "Brasa - Serveur local", "Brasa - Lokaler Server");
+            E("Brasa — Servidor local", "Brasa — Local server", "Brasa — Serveur local", "Brasa — Lokaler Server");
+            E("No se pudo abrir el navegador.", "Could not open the browser.", "Impossible d'ouvrir le navigateur.", "Der Browser konnte nicht geöffnet werden.");
+            E("Términos y condiciones", "Terms and conditions", "Conditions d'utilisation", "Nutzungsbedingungen");
+            E("TÉRMINOS Y CONDICIONES", "TERMS AND CONDITIONS", "CONDITIONS D'UTILISATION", "NUTZUNGSBEDINGUNGEN");
+            E("Antes de empezar", "Before you start", "Avant de commencer", "Bevor es losgeht");
+            E("Para usar Brasa tienes que aceptar los términos y condiciones.", "To use Brasa you must accept the terms and conditions.", "Pour utiliser Brasa, vous devez accepter les conditions d'utilisation.", "Um Brasa zu nutzen, musst du die Nutzungsbedingungen akzeptieren.");
+            E("He leído y acepto los términos y condiciones", "I have read and accept the terms and conditions", "J'ai lu et j'accepte les conditions d'utilisation", "Ich habe die Nutzungsbedingungen gelesen und akzeptiere sie");
+            E("No acepto", "I decline", "Je refuse", "Ablehnen");
+            E("Aceptar", "Accept", "Accepter", "Akzeptieren");
+            E("Cerrar", "Close", "Fermer", "Schließen");
+            E("Cancelar", "Cancel", "Annuler", "Abbrechen");
+            E("Cambiar...", "Change...", "Modifier...", "Ändern...");
+            E("OPCIONES", "OPTIONS", "OPTIONS", "OPTIONEN");
+            E("Error: ", "Error: ", "Erreur : ", "Fehler: ");
+            E("Error", "Error", "Erreur", "Fehler");
+            E("Reintentar", "Retry", "Réessayer", "Wiederholen");
+            E("Abrir Brasa", "Open Brasa", "Ouvrir Brasa", "Brasa öffnen");
+            E("El puerto {0} está ocupado por {1}.", "Port {0} is in use by {1}.", "Le port {0} est utilisé par {1}.", "Port {0} wird von {1} belegt.");
+
+            // ---------- Instalador ----------
+            E("Instalar Brasa", "Install Brasa", "Installer Brasa", "Brasa installieren");
+            E("CARPETA DE INSTALACIÓN", "INSTALLATION FOLDER", "DOSSIER D'INSTALLATION", "INSTALLATIONSORDNER");
+            E("PUERTOS", "PORTS", "PORTS", "PORTS");
+            E("(los habituales para desarrollo local)", "(the usual ones for local development)", "(les ports habituels en développement local)", "(die üblichen für lokale Entwicklung)");
+            E("Acceso directo en el escritorio", "Desktop shortcut", "Raccourci sur le bureau", "Verknüpfung auf dem Desktop");
+            E("Arrancar Brasa con Windows", "Start Brasa with Windows", "Lancer Brasa avec Windows", "Brasa mit Windows starten");
+            E("Abrir Brasa al terminar", "Open Brasa when finished", "Ouvrir Brasa à la fin", "Brasa am Ende öffnen");
+            E("¿Dudas o sugerencias?", "Questions or suggestions?", "Des questions ou des idées ?", "Fragen oder Vorschläge?");
+            E("Pásate por el Discord de LiteScripts.\nEs gratis: no se garantiza respuesta, pero lo intentamos.", "Drop by the LiteScripts Discord.\nIt's free: replies aren't guaranteed, but we try.", "Passez sur le Discord de LiteScripts.\nC'est gratuit : pas de réponse garantie, mais on essaie.", "Schau im Discord von LiteScripts vorbei.\nEs ist kostenlos: keine Antwortgarantie, aber wir geben uns Mühe.");
+            E("Unirme al Discord", "Join the Discord", "Rejoindre le Discord", "Discord beitreten");
+            E("Gratis · Desarrollado por hotbambi", "Free · Developed by hotbambi", "Gratuit · Développé par hotbambi", "Kostenlos · Entwickelt von hotbambi");
+            E("Siguiente", "Next", "Suivant", "Weiter");
+            E("La instalación está en marcha. ¿Cancelarla?", "The installation is in progress. Cancel it?", "L'installation est en cours. L'annuler ?", "Die Installation läuft. Abbrechen?");
+            E("Tu servidor local: Apache, PHP 8.4, MariaDB y phpMyAdmin.\nPaso 1 de 3 · Para instalar tienes que aceptar los términos.", "Your local server: Apache, PHP 8.4, MariaDB and phpMyAdmin.\nStep 1 of 3 · You must accept the terms to install.", "Votre serveur local : Apache, PHP 8.4, MariaDB et phpMyAdmin.\nÉtape 1 sur 3 · Vous devez accepter les conditions pour installer.", "Dein lokaler Server: Apache, PHP 8.4, MariaDB und phpMyAdmin.\nSchritt 1 von 3 · Zum Installieren musst du die Bedingungen akzeptieren.");
+            E("¿Dónde lo instalo?", "Where should I install it?", "Où l'installer ?", "Wo soll es hin?");
+            E("Paso 2 de 3 · Se descargan unos 150 MB de las webs oficiales.", "Step 2 of 3 · About 150 MB are downloaded from the official websites.", "Étape 2 sur 3 · Environ 150 Mo sont téléchargés depuis les sites officiels.", "Schritt 2 von 3 · Etwa 150 MB werden von den offiziellen Websites geladen.");
+            E("Instalando...", "Installing...", "Installation...", "Installiere...");
+            E("Paso 3 de 3 · No cierres esta ventana.", "Step 3 of 3 · Don't close this window.", "Étape 3 sur 3 · Ne fermez pas cette fenêtre.", "Schritt 3 von 3 · Schließe dieses Fenster nicht.");
+            E("¡Listo!", "All done!", "C'est prêt !", "Fertig!");
+            E("Brasa está instalado.", "Brasa is installed.", "Brasa est installé.", "Brasa ist installiert.");
+            E("Atrás", "Back", "Retour", "Zurück");
+            E("Instalar", "Install", "Installer", "Installieren");
+            E("Copiar registro", "Copy log", "Copier le log", "Log kopieren");
+            E("¡Copiado!", "Copied!", "Copié !", "Kopiert!");
+            E("Elige dónde instalar Brasa (mejor una ruta corta, por ejemplo C:\\Brasa)", "Choose where to install Brasa (a short path is best, e.g. C:\\Brasa)", "Choisissez où installer Brasa (un chemin court de préférence, par ex. C:\\Brasa)", "Wähle, wo Brasa installiert wird (am besten ein kurzer Pfad, z. B. C:\\Brasa)");
+            E("Escribe una carpeta.", "Enter a folder.", "Indiquez un dossier.", "Gib einen Ordner an.");
+            E("Esa ruta no es válida.", "That path is not valid.", "Ce chemin n'est pas valide.", "Dieser Pfad ist ungültig.");
+            E("La ruta tiene tildes, eñes u otros caracteres raros: Apache falla con eso. Usa algo como C:\\Brasa.", "The path has accents or other special characters: Apache fails with those. Use something like C:\\Brasa.", "Le chemin contient des accents ou d'autres caractères spéciaux : Apache ne les supporte pas. Utilisez par ex. C:\\Brasa.", "Der Pfad enthält Umlaute oder andere Sonderzeichen: Damit scheitert Apache. Verwende z. B. C:\\Brasa.");
+            E("No la pongas dentro de OneDrive (el Escritorio o Documentos suelen estarlo): da fallos. Usa C:\\Brasa.", "Don't put it inside OneDrive (Desktop and Documents often are): it causes errors. Use C:\\Brasa.", "Ne le mettez pas dans OneDrive (le Bureau et les Documents y sont souvent) : cela pose problème. Utilisez C:\\Brasa.", "Nicht in OneDrive ablegen (Desktop und Dokumente liegen oft dort): Das führt zu Fehlern. Verwende C:\\Brasa.");
+            E("Esa es una carpeta temporal. Usa C:\\Brasa.", "That is a temporary folder. Use C:\\Brasa.", "C'est un dossier temporaire. Utilisez C:\\Brasa.", "Das ist ein temporärer Ordner. Verwende C:\\Brasa.");
+            E("Elige una carpeta, no la raíz del disco.", "Choose a folder, not the root of the drive.", "Choisissez un dossier, pas la racine du disque.", "Wähle einen Ordner, nicht das Stammverzeichnis des Laufwerks.");
+            E("Mejor fuera de Archivos de programa (Windows no deja escribir ahí sin permisos). Usa C:\\Brasa.", "Better outside Program Files (Windows doesn't allow writing there without permissions). Use C:\\Brasa.", "Mieux vaut éviter Program Files (Windows n'y autorise pas l'écriture sans droits). Utilisez C:\\Brasa.", "Besser nicht unter Programme (Windows erlaubt dort ohne Rechte keine Schreibzugriffe). Verwende C:\\Brasa.");
+            E("Puedes instalar igualmente, pero cierra ese programa antes de encender Brasa. Si es otro servidor local, desde Brasa podrás migrar tus datos.", "You can install anyway, but close that program before starting Brasa. If it's another local server, you can migrate your data from Brasa.", "Vous pouvez installer quand même, mais fermez ce programme avant de démarrer Brasa. S'il s'agit d'un autre serveur local, vous pourrez migrer vos données depuis Brasa.", "Du kannst trotzdem installieren, aber schließe dieses Programm, bevor du Brasa startest. Ist es ein anderer lokaler Server, kannst du deine Daten aus Brasa heraus migrieren.");
+            E("Preparando...", "Preparing...", "Préparation...", "Vorbereitung...");
+            E("Brasa está abierto. Para instalar hay que cerrarlo (se apagarán Apache y MariaDB).\n\n¿Cerrar Brasa ahora?", "Brasa is open. It has to be closed to install (Apache and MariaDB will be stopped).\n\nClose Brasa now?", "Brasa est ouvert. Il faut le fermer pour installer (Apache et MariaDB seront arrêtés).\n\nFermer Brasa maintenant ?", "Brasa ist geöffnet. Zum Installieren muss es geschlossen werden (Apache und MariaDB werden gestoppt).\n\nBrasa jetzt schließen?");
+            E("Cerrar Brasa", "Close Brasa", "Fermer Brasa", "Brasa schließen");
+            E("Cerrando Brasa (apaga Apache y MariaDB)...", "Closing Brasa (stopping Apache and MariaDB)...", "Fermeture de Brasa (arrêt d'Apache et MariaDB)...", "Brasa wird geschlossen (Apache und MariaDB werden gestoppt)...");
+            E("Brasa cerrado.", "Brasa closed.", "Brasa fermé.", "Brasa geschlossen.");
+            E("Brasa no se ha podido cerrar. Ciérralo desde su menú (Salir) y pulsa Reintentar.", "Brasa couldn't be closed. Close it from its menu (Exit) and click Retry.", "Impossible de fermer Brasa. Fermez-le depuis son menu (Quitter) puis cliquez sur Réessayer.", "Brasa konnte nicht geschlossen werden. Schließe es über sein Menü (Beenden) und klicke auf Wiederholen.");
+            E("Copiando archivos a {0}", "Copying files to {0}", "Copie des fichiers vers {0}", "Kopiere Dateien nach {0}");
+            E("Algo ha fallado al instalar los componentes (mira los detalles).", "Something went wrong installing the components (see the details).", "L'installation des composants a échoué (voir les détails).", "Bei der Installation der Komponenten ist etwas schiefgelaufen (siehe Details).");
+            E("Falta {0} después de instalar. Pulsa Reintentar.", "{0} is missing after installing. Click Retry.", "{0} est manquant après l'installation. Cliquez sur Réessayer.", "{0} fehlt nach der Installation. Klicke auf Wiederholen.");
+            E("Creando accesos directos...", "Creating shortcuts...", "Création des raccourcis...", "Erstelle Verknüpfungen...");
+            E("Aviso: no se pudo crear un acceso directo ({0})", "Warning: could not create a shortcut ({0})", "Attention : impossible de créer un raccourci ({0})", "Warnung: Verknüpfung konnte nicht erstellt werden ({0})");
+            E("Accesos directos creados. Brasa aparece en el menú Inicio y en Aplicaciones instaladas.", "Shortcuts created. Brasa appears in the Start menu and in Installed apps.", "Raccourcis créés. Brasa apparaît dans le menu Démarrer et dans Applications installées.", "Verknüpfungen erstellt. Brasa erscheint im Startmenü und unter Installierte Apps.");
+            E("Lo tienes en el menú Inicio y en el escritorio.", "You'll find it in the Start menu and on the desktop.", "Vous le trouverez dans le menu Démarrer et sur le bureau.", "Du findest es im Startmenü und auf dem Desktop.");
+            E("Lo tienes en el menú Inicio.", "You'll find it in the Start menu.", "Vous le trouverez dans le menu Démarrer.", "Du findest es im Startmenü.");
+            E("Tus proyectos van en", "Your projects go in", "Vos projets vont dans", "Deine Projekte kommen nach");
+            E("Base de datos:   localhost · usuario root · sin contraseña", "Database:   localhost · user root · no password", "Base de données :   localhost · utilisateur root · sans mot de passe", "Datenbank:   localhost · Benutzer root · kein Passwort");
+            E("¿Tienes datos en XAMPP? En Brasa pulsa «Migrar desde XAMPP».", "Have data in XAMPP? In Brasa click \"Migrate from XAMPP\".", "Des données dans XAMPP ? Dans Brasa, cliquez sur « Migrer depuis XAMPP ».", "Daten in XAMPP? Klicke in Brasa auf „Von XAMPP migrieren“.");
+            E("Al cerrar Brasa con la X sigue funcionando: lo tienes en la esquina inferior derecha de la pantalla (si no lo ves, pulsa la flecha ^).", "Closing Brasa with the X keeps it running: find it in the bottom-right corner of the screen (if you can't see it, click the ^ arrow).", "Si vous fermez Brasa avec la croix, il continue de tourner : il est dans le coin inférieur droit de l'écran (si vous ne le voyez pas, cliquez sur la flèche ^).", "Schließt du Brasa mit dem X, läuft es weiter: du findest es in der unteren rechten Ecke des Bildschirms (falls nicht sichtbar, klicke auf den Pfeil ^).");
+
+            // ---------- Migración ----------
+            E("código ", "code ", "code ", "Code ");
+            E("Migración terminada. Ya puedes desinstalar XAMPP si quieres.", "Migration finished. You can uninstall XAMPP now if you want.", "Migration terminée. Vous pouvez désinstaller XAMPP si vous le souhaitez.", "Migration abgeschlossen. Du kannst XAMPP jetzt deinstallieren, wenn du willst.");
+            E("La migración ha terminado con avisos (mira arriba).", "The migration finished with warnings (see above).", "La migration s'est terminée avec des avertissements (voir ci-dessus).", "Die Migration wurde mit Warnungen beendet (siehe oben).");
+            E("No encuentro mysqldump.exe en XAMPP.", "Can't find mysqldump.exe in XAMPP.", "mysqldump.exe introuvable dans XAMPP.", "mysqldump.exe in XAMPP nicht gefunden.");
+            E("antes de migrar", "before migrating", "avant la migration", "vor der Migration");
+            E("El MySQL de XAMPP ya está encendido (puerto {0}). Lo uso.", "XAMPP's MySQL is already running (port {0}). Using it.", "Le MySQL de XAMPP est déjà démarré (port {0}). Je l'utilise.", "Das MySQL von XAMPP läuft bereits (Port {0}). Es wird verwendet.");
+            E("Arrancando el MySQL de XAMPP en modo lectura (puerto temporal {0})...", "Starting XAMPP's MySQL in read mode (temporary port {0})...", "Démarrage du MySQL de XAMPP en mode lecture (port temporaire {0})...", "Starte das MySQL von XAMPP im Lesemodus (temporärer Port {0})...");
+            E("El MySQL de XAMPP no arranca. Puede que sus datos estén dañados (un fallo típico de XAMPP).", "XAMPP's MySQL won't start. Its data may be damaged (a typical XAMPP failure).", "Le MySQL de XAMPP ne démarre pas. Ses données sont peut-être endommagées (une panne typique de XAMPP).", "Das MySQL von XAMPP startet nicht. Möglicherweise sind seine Daten beschädigt (ein typischer XAMPP-Fehler).");
+            E("No puedo leer las bases de datos de XAMPP: ", "Can't read XAMPP's databases: ", "Impossible de lire les bases de données de XAMPP : ", "Die Datenbanken von XAMPP können nicht gelesen werden: ");
+            E("Si root tiene contraseña: para MySQL en el panel de XAMPP (Stop) y pulsa Migrar otra vez.", "If root has a password: stop MySQL in the XAMPP panel (Stop) and click Migrate again.", "Si root a un mot de passe : arrêtez MySQL dans le panneau de XAMPP (Stop) et cliquez à nouveau sur Migrer.", "Falls root ein Passwort hat: Stoppe MySQL im XAMPP-Panel (Stop) und klicke erneut auf Migrieren.");
+            E("XAMPP no tiene bases de datos tuyas. Nada que pasar.", "XAMPP has no databases of yours. Nothing to move.", "XAMPP ne contient aucune de vos bases de données. Rien à transférer.", "XAMPP enthält keine eigenen Datenbanken. Nichts zu übertragen.");
+            E("Bases encontradas: ", "Databases found: ", "Bases trouvées : ", "Gefundene Datenbanken: ");
+            E("Exportando desde XAMPP...", "Exporting from XAMPP...", "Export depuis XAMPP...", "Exportiere aus XAMPP...");
+            E("Error al exportar: ", "Export error: ", "Erreur d'exportation : ", "Fehler beim Exportieren: ");
+            E("Exportado: {0} ({1} KB). Se guarda en Copias.", "Exported: {0} ({1} KB). Kept in Backups.", "Exporté : {0} ({1} Ko). Conservé dans Sauvegardes.", "Exportiert: {0} ({1} KB). Wird unter Sicherungen aufbewahrt.");
+            E("MySQL de XAMPP apagado.", "XAMPP's MySQL stopped.", "MySQL de XAMPP arrêté.", "MySQL von XAMPP gestoppt.");
+            E("Encendiendo MariaDB de Brasa...", "Starting Brasa's MariaDB...", "Démarrage de MariaDB de Brasa...", "Starte MariaDB von Brasa...");
+            E("XAMPP no tiene carpeta htdocs.", "XAMPP has no htdocs folder.", "XAMPP n'a pas de dossier htdocs.", "XAMPP hat keinen htdocs-Ordner.");
+            E("Copiando tus proyectos de htdocs a www (no se sobrescribe nada que ya exista)...", "Copying your projects from htdocs to www (nothing that already exists is overwritten)...", "Copie de vos projets de htdocs vers www (rien de ce qui existe n'est écrasé)...", "Kopiere deine Projekte von htdocs nach www (Vorhandenes wird nicht überschrieben)...");
+            E("Archivos copiados: ", "Files copied: ", "Fichiers copiés : ", "Kopierte Dateien: ");
+            E("({0} ya existían y no se han tocado)", "({0} already existed and were left untouched)", "({0} existaient déjà et n'ont pas été modifiés)", "({0} waren bereits vorhanden und wurden nicht angetastet)");
+            E("No se pudo copiar {0}: {1}", "Could not copy {0}: {1}", "Impossible de copier {0} : {1}", "{0} konnte nicht kopiert werden: {1}");
+            E("Migrar desde XAMPP", "Migrate from XAMPP", "Migrer depuis XAMPP", "Von XAMPP migrieren");
+            E("Migrar desde XAMPP...", "Migrate from XAMPP...", "Migrer depuis XAMPP...", "Von XAMPP migrieren...");
+            E("Migrar desde XAMPP a Brasa", "Migrate from XAMPP to Brasa", "Migrer de XAMPP vers Brasa", "Von XAMPP zu Brasa migrieren");
+            E("Copia tus bases de datos y tus proyectos. XAMPP no se borra ni se modifica.", "Copies your databases and projects. XAMPP is not deleted or modified.", "Copie vos bases de données et vos projets. XAMPP n'est ni supprimé ni modifié.", "Kopiert deine Datenbanken und Projekte. XAMPP wird weder gelöscht noch verändert.");
+            E("CARPETA DE XAMPP", "XAMPP FOLDER", "DOSSIER DE XAMPP", "XAMPP-ORDNER");
+            E("Elige la carpeta de XAMPP (la que tiene mysql y htdocs)", "Choose the XAMPP folder (the one with mysql and htdocs)", "Choisissez le dossier de XAMPP (celui qui contient mysql et htdocs)", "Wähle den XAMPP-Ordner (der mit mysql und htdocs)");
+            E("Bases de datos (todas las tuyas)", "Databases (all of yours)", "Bases de données (toutes les vôtres)", "Datenbanken (alle eigenen)");
+            E("Proyectos de htdocs → carpeta www", "Projects in htdocs → www folder", "Projets de htdocs → dossier www", "Projekte aus htdocs → Ordner www");
+            E("Antes de empezar, Brasa hace una copia de seguridad. Si en Brasa ya existe una base con el mismo nombre, sus tablas se sustituyen por las de XAMPP.", "Before starting, Brasa makes a backup. If a database with the same name already exists in Brasa, its tables are replaced by XAMPP's.", "Avant de commencer, Brasa fait une sauvegarde. Si une base du même nom existe déjà dans Brasa, ses tables sont remplacées par celles de XAMPP.", "Vor dem Start erstellt Brasa eine Sicherung. Gibt es in Brasa bereits eine Datenbank mit demselben Namen, werden ihre Tabellen durch die von XAMPP ersetzt.");
+            E("XAMPP pertenece a sus autores. Brasa no está afiliado ni respaldado por ellos: solo lee tus propios datos para copiarlos.", "XAMPP belongs to its authors. Brasa is not affiliated with or endorsed by them: it only reads your own data to copy it.", "XAMPP appartient à ses auteurs. Brasa n'est ni affilié ni approuvé par eux : il lit seulement vos propres données pour les copier.", "XAMPP gehört seinen Autoren. Brasa ist weder mit ihnen verbunden noch von ihnen unterstützt: Es liest nur deine eigenen Daten, um sie zu kopieren.");
+            E("Migrar", "Migrate", "Migrer", "Migrieren");
+            E("XAMPP encontrado en {0}.", "XAMPP found in {0}.", "XAMPP trouvé dans {0}.", "XAMPP gefunden in {0}.");
+            E("No encuentro XAMPP. Elige su carpeta con Cambiar...", "Can't find XAMPP. Choose its folder with Change...", "XAMPP introuvable. Choisissez son dossier avec Modifier...", "XAMPP nicht gefunden. Wähle den Ordner mit Ändern...");
+            E("Espera a que termine la migración.", "Wait for the migration to finish.", "Attendez la fin de la migration.", "Warte, bis die Migration abgeschlossen ist.");
+            E("En esa carpeta no hay un XAMPP (falta mysql\\bin\\mysqld.exe).", "There's no XAMPP in that folder (mysql\\bin\\mysqld.exe is missing).", "Ce dossier ne contient pas de XAMPP (mysql\\bin\\mysqld.exe manquant).", "In diesem Ordner ist kein XAMPP (mysql\\bin\\mysqld.exe fehlt).");
+            E("Brasa no está instalado del todo. Ejecuta el instalador antes.", "Brasa isn't fully installed. Run the installer first.", "Brasa n'est pas entièrement installé. Lancez d'abord l'installateur.", "Brasa ist nicht vollständig installiert. Führe zuerst das Installationsprogramm aus.");
+            E("Migrando...", "Migrating...", "Migration...", "Migriere...");
+            E("Hecho", "Done", "Terminé", "Fertig");
+
+            // ---------- Panel ----------
+            E("Servidor local  ·  Apache  ·  PHP  ·  MariaDB  ·  by LiteScripts", "Local server  ·  Apache  ·  PHP  ·  MariaDB  ·  by LiteScripts", "Serveur local  ·  Apache  ·  PHP  ·  MariaDB  ·  by LiteScripts", "Lokaler Server  ·  Apache  ·  PHP  ·  MariaDB  ·  by LiteScripts");
+            E("Comprobando...", "Checking...", "Vérification...", "Prüfe...");
+            E("SERVICIOS", "SERVICES", "SERVICES", "DIENSTE");
+            E("Encender todo", "Start all", "Tout démarrer", "Alle starten");
+            E("Apagar todo", "Stop all", "Tout arrêter", "Alle stoppen");
+            E("Reiniciar", "Restart", "Redémarrer", "Neu starten");
+            E("Arrancar con Windows", "Start with Windows", "Lancer avec Windows", "Mit Windows starten");
+            E("Encender servidores al abrir", "Start servers on open", "Démarrer les serveurs à l'ouverture", "Server beim Öffnen starten");
+            E("Vigilante (reinicia si se cae)", "Watchdog (restarts on crash)", "Surveillance (relance si plantage)", "Wächter (Neustart bei Absturz)");
+            E("Copia de seguridad diaria", "Daily backup", "Sauvegarde quotidienne", "Tägliche Sicherung");
+            E("No se pudo cambiar el inicio con Windows: ", "Could not change start with Windows: ", "Impossible de modifier le lancement avec Windows : ", "Start mit Windows konnte nicht geändert werden: ");
+            E("ACCESOS RÁPIDOS", "QUICK ACCESS", "ACCÈS RAPIDES", "SCHNELLZUGRIFF");
+            E("Abrir web", "Open website", "Ouvrir le site", "Website öffnen");
+            E("Carpeta www", "www folder", "Dossier www", "Ordner www");
+            E("Ver copias", "View backups", "Voir les sauvegardes", "Sicherungen ansehen");
+            E("Copia de seguridad", "Back up now", "Sauvegarder", "Jetzt sichern");
+            E("Copia de seguridad ahora", "Back up now", "Sauvegarder maintenant", "Jetzt sichern");
+            E("Importar .sql", "Import .sql", "Importer un .sql", ".sql importieren");
+            E("ACTIVIDAD", "ACTIVITY", "ACTIVITÉ", "AKTIVITÄT");
+            E("Brasa es gratis  ·  Desarrollado por hotbambi", "Brasa is free  ·  Developed by hotbambi", "Brasa est gratuit  ·  Développé par hotbambi", "Brasa ist kostenlos  ·  Entwickelt von hotbambi");
+            E("Tienda", "Store", "Boutique", "Shop");
+            E("Encender", "Start", "Démarrer", "Starten");
+            E("Apagar", "Stop", "Arrêter", "Stoppen");
+            E("Discord de LiteScripts", "LiteScripts Discord", "Discord de LiteScripts", "LiteScripts-Discord");
+            E("Tienda LiteScripts", "LiteScripts store", "Boutique LiteScripts", "LiteScripts-Shop");
+            E("Salir (apaga el servidor)", "Exit (stops the server)", "Quitter (arrête le serveur)", "Beenden (stoppt den Server)");
+            E("Brasa listo. Al cerrar con la X sigue funcionando en la esquina inferior derecha de la pantalla (flecha ^).", "Brasa ready. Closing with the X keeps it running in the bottom-right corner of the screen (^ arrow).", "Brasa est prêt. Si vous fermez avec la croix, il continue dans le coin inférieur droit de l'écran (flèche ^).", "Brasa bereit. Schließt du mit dem X, läuft es in der unteren rechten Ecke des Bildschirms weiter (Pfeil ^).");
+            E("Brasa no está instalado del todo en esta carpeta. Abre Brasa-Instalador.exe otra vez.", "Brasa isn't fully installed in this folder. Run Brasa-Instalador.exe again.", "Brasa n'est pas entièrement installé dans ce dossier. Relancez Brasa-Instalador.exe.", "Brasa ist in diesem Ordner nicht vollständig installiert. Starte Brasa-Instalador.exe erneut.");
+            E("Brasa no está instalado del todo. Abre Brasa-Instalador.exe otra vez.", "Brasa isn't fully installed. Run Brasa-Instalador.exe again.", "Brasa n'est pas entièrement installé. Relancez Brasa-Instalador.exe.", "Brasa ist nicht vollständig installiert. Starte Brasa-Instalador.exe erneut.");
+            E("Brasa sigue funcionando", "Brasa is still running", "Brasa tourne toujours", "Brasa läuft weiter");
+            E("Lo tienes aquí, en la esquina inferior derecha de la pantalla. Clic para abrirlo; clic derecho para el menú.", "It's here, in the bottom-right corner of the screen. Click to open it; right-click for the menu.", "Il est ici, dans le coin inférieur droit de l'écran. Clic pour l'ouvrir ; clic droit pour le menu.", "Es ist hier in der unteren rechten Ecke des Bildschirms. Klicken zum Öffnen, Rechtsklick für das Menü.");
+            E("Espera a que termine la migración antes de salir.", "Wait for the migration to finish before exiting.", "Attendez la fin de la migration avant de quitter.", "Warte vor dem Beenden, bis die Migration abgeschlossen ist.");
+            E("Se apagarán Apache y MariaDB y Brasa se cerrará.\n\n¿Salir?", "Apache and MariaDB will be stopped and Brasa will close.\n\nExit?", "Apache et MariaDB seront arrêtés et Brasa se fermera.\n\nQuitter ?", "Apache und MariaDB werden gestoppt und Brasa wird geschlossen.\n\nBeenden?");
+            E("Apagando todo para salir...", "Stopping everything to exit...", "Arrêt de tout avant de quitter...", "Stoppe alles zum Beenden...");
+            E("Brasa — apagando...", "Brasa — stopping...", "Brasa — arrêt...", "Brasa — wird gestoppt...");
+            E("automática diaria", "automatic daily", "quotidienne automatique", "automatisch täglich");
+            E("Algo no ha arrancado. Abre Brasa para ver el motivo.", "Something didn't start. Open Brasa to see why.", "Quelque chose n'a pas démarré. Ouvrez Brasa pour voir pourquoi.", "Etwas ist nicht gestartet. Öffne Brasa, um den Grund zu sehen.");
+            E("Servidor encendido en ", "Server running at ", "Serveur démarré sur ", "Server läuft unter ");
+            E("Ojo: Apache está apagado, la página no cargará.", "Note: Apache is stopped, the page won't load.", "Attention : Apache est arrêté, la page ne se chargera pas.", "Achtung: Apache ist gestoppt, die Seite wird nicht geladen.");
+            E("No se pudo abrir la carpeta: ", "Could not open the folder: ", "Impossible d'ouvrir le dossier : ", "Ordner konnte nicht geöffnet werden: ");
+            E("Todavía no hay registro de {0}.", "There's no log for {0} yet.", "Pas encore de journal pour {0}.", "Für {0} gibt es noch kein Log.");
+            E("Copia de seguridad hecha", "Backup done", "Sauvegarde effectuée", "Sicherung erstellt");
+            E("Enciende MariaDB antes de importar.", "Start MariaDB before importing.", "Démarrez MariaDB avant d'importer.", "Starte MariaDB vor dem Import.");
+            E("Archivos SQL (*.sql)|*.sql|Todos los archivos|*.*", "SQL files (*.sql)|*.sql|All files|*.*", "Fichiers SQL (*.sql)|*.sql|Tous les fichiers|*.*", "SQL-Dateien (*.sql)|*.sql|Alle Dateien|*.*");
+            E("Elige el .sql que quieres importar", "Choose the .sql you want to import", "Choisissez le .sql à importer", "Wähle die .sql-Datei zum Importieren");
+            E("Este .sql ya indica sus bases de datos: se importa tal cual.", "This .sql already names its databases: importing it as is.", "Ce .sql indique déjà ses bases de données : il est importé tel quel.", "Diese .sql-Datei nennt ihre Datenbanken bereits: Sie wird unverändert importiert.");
+            E("¿En qué base de datos lo meto? Si no existe, la creo.", "Which database should it go into? If it doesn't exist, I'll create it.", "Dans quelle base de données l'importer ? Si elle n'existe pas, je la crée.", "In welche Datenbank soll es? Wenn sie nicht existiert, wird sie angelegt.");
+            E("Importar", "Import", "Importer", "Importieren");
+            E("Espera a que termine la operación en curso para cambiar el idioma.", "Wait for the current operation to finish before changing the language.", "Attendez la fin de l'opération en cours pour changer de langue.", "Warte, bis der aktuelle Vorgang abgeschlossen ist, um die Sprache zu ändern.");
+            E("No se pudo guardar el ajuste: ", "Could not save the setting: ", "Impossible d'enregistrer le réglage : ", "Einstellung konnte nicht gespeichert werden: ");
+            E("{0} se ha caído 3 veces en 5 minutos. El vigilante se rinde: mira el log.", "{0} crashed 3 times in 5 minutes. The watchdog gives up: check the log.", "{0} a planté 3 fois en 5 minutes. La surveillance abandonne : consultez le log.", "{0} ist 3-mal in 5 Minuten abgestürzt. Der Wächter gibt auf: Sieh dir das Log an.");
+            E("{0} se cae una y otra vez. Abre Brasa para ver el motivo.", "{0} keeps crashing. Open Brasa to see why.", "{0} plante sans arrêt. Ouvrez Brasa pour voir pourquoi.", "{0} stürzt immer wieder ab. Öffne Brasa, um den Grund zu sehen.");
+            E("{0} se ha caído. El vigilante lo vuelve a encender...", "{0} crashed. The watchdog is restarting it...", "{0} a planté. La surveillance le relance...", "{0} ist abgestürzt. Der Wächter startet es neu...");
+            E("Todo encendido", "All running", "Tout est démarré", "Alles läuft");
+            E("Hay un problema", "There's a problem", "Il y a un problème", "Es gibt ein Problem");
+            E("Trabajando...", "Working...", "En cours...", "Arbeite...");
+            E("Apagado", "Stopped", "Arrêté", "Gestoppt");
+            E("Encendido a medias", "Partly running", "Démarré en partie", "Teilweise aktiv");
+            E("Encendido", "Running", "Démarré", "Läuft");
+            E("Arrancando...", "Starting...", "Démarrage...", "Startet...");
+            E("Apagando...", "Stopping...", "Arrêt...", "Stoppt...");
+            E("puerto", "port", "port", "Port");
+            E("recién encendido", "just started", "vient de démarrer", "gerade gestartet");
+            E("d", "d", "j", "T");
+
+            // ---------- Desinstalar ----------
+            E("¿Quieres desinstalar Brasa?", "Do you want to uninstall Brasa?", "Voulez-vous désinstaller Brasa ?", "Möchtest du Brasa deinstallieren?");
+            E("Desinstalar Brasa", "Uninstall Brasa", "Désinstaller Brasa", "Brasa deinstallieren");
+            E("¿Conservar tus bases de datos, la carpeta www y las copias de seguridad?", "Keep your databases, the www folder and the backups?", "Conserver vos bases de données, le dossier www et les sauvegardes ?", "Datenbanken, den Ordner www und die Sicherungen behalten?");
+            E("Sí: se quedan en {0}\nNo: se borra TODO", "Yes: they stay in {0}\nNo: EVERYTHING is deleted", "Oui : ils restent dans {0}\nNon : TOUT est supprimé", "Ja: Sie bleiben in {0}\nNein: ALLES wird gelöscht");
+            E("Brasa desinstalado. Tus datos siguen en:", "Brasa uninstalled. Your data is still in:", "Brasa désinstallé. Vos données sont toujours dans :", "Brasa deinstalliert. Deine Daten liegen weiterhin in:");
+            E("Brasa desinstalado por completo.", "Brasa completely uninstalled.", "Brasa entièrement désinstallé.", "Brasa vollständig deinstalliert.");
+
+            // ---------- Servicios ----------
+            E("Windows (IIS / servicio web del sistema)", "Windows (IIS / system web service)", "Windows (IIS / service web du système)", "Windows (IIS / Webdienst des Systems)");
+            E(" de XAMPP", " from XAMPP", " de XAMPP", " von XAMPP");
+            E("otro programa", "another program", "un autre programme", "ein anderes Programm");
+            E("No está instalado: falta {0}", "Not installed: {0} is missing", "Non installé : {0} est manquant", "Nicht installiert: {0} fehlt");
+            E("El puerto {0} está ocupado por {1}. Ciérralo y vuelve a intentarlo.", "Port {0} is in use by {1}. Close it and try again.", "Le port {0} est utilisé par {1}. Fermez-le et réessayez.", "Port {0} wird von {1} belegt. Schließe es und versuche es erneut.");
+            E("Encendiendo {0}...", "Starting {0}...", "Démarrage de {0}...", "Starte {0}...");
+            E("No se pudo lanzar: ", "Could not launch: ", "Impossible de lancer : ", "Start fehlgeschlagen: ");
+            E("{0} encendido en el puerto {1}.", "{0} running on port {1}.", "{0} démarré sur le port {1}.", "{0} läuft auf Port {1}.");
+            E("{0} se ha cerrado nada más arrancar (código {1}).", "{0} closed right after starting (code {1}).", "{0} s'est fermé juste après le démarrage (code {1}).", "{0} wurde direkt nach dem Start beendet (Code {1}).");
+            E("{0} no responde en el puerto {1}.", "{0} isn't responding on port {1}.", "{0} ne répond pas sur le port {1}.", "{0} antwortet nicht auf Port {1}.");
+            E("Apagando {0}...", "Stopping {0}...", "Arrêt de {0}...", "Stoppe {0}...");
+            E("MariaDB no respondió al apagado normal (¿root tiene contraseña?). Forzando cierre.", "MariaDB didn't respond to a normal shutdown (does root have a password?). Forcing it to close.", "MariaDB n'a pas répondu à l'arrêt normal (root a-t-il un mot de passe ?). Fermeture forcée.", "MariaDB hat auf das normale Herunterfahren nicht reagiert (hat root ein Passwort?). Erzwinge das Beenden.");
+            E("{0} apagado.", "{0} stopped.", "{0} arrêté.", "{0} gestoppt.");
+            E("Para hacer una copia, MariaDB tiene que estar encendido.", "MariaDB must be running to make a backup.", "MariaDB doit être démarré pour faire une sauvegarde.", "Für eine Sicherung muss MariaDB laufen.");
+            E("No encuentro {0}.", "Can't find {0}.", "{0} introuvable.", "{0} nicht gefunden.");
+            E("Haciendo copia de seguridad", "Making a backup", "Sauvegarde en cours", "Erstelle Sicherung");
+            E("La copia ha fallado: ", "The backup failed: ", "La sauvegarde a échoué : ", "Die Sicherung ist fehlgeschlagen: ");
+            E("Copia guardada: ", "Backup saved: ", "Sauvegarde enregistrée : ", "Sicherung gespeichert: ");
+            E("Para importar, MariaDB tiene que estar encendido.", "MariaDB must be running to import.", "MariaDB doit être démarré pour importer.", "Für den Import muss MariaDB laufen.");
+            E("Importando {0} en Brasa... (puede tardar)", "Importing {0} into Brasa... (this may take a while)", "Importation de {0} dans Brasa... (cela peut prendre du temps)", "Importiere {0} in Brasa... (kann dauern)");
+            E("Error al importar: ", "Import error: ", "Erreur d'importation : ", "Fehler beim Importieren: ");
+            E("Bases de datos importadas en Brasa.", "Databases imported into Brasa.", "Bases de données importées dans Brasa.", "Datenbanken in Brasa importiert.");
+            E("Importando {0} en '{1}'... (puede tardar)", "Importing {0} into '{1}'... (this may take a while)", "Importation de {0} dans '{1}'... (cela peut prendre du temps)", "Importiere {0} in '{1}'... (kann dauern)");
+            E("Importación terminada en '{0}'.", "Import finished into '{0}'.", "Importation terminée dans '{0}'.", "Import in '{0}' abgeschlossen.");
+        }
+    }
+}

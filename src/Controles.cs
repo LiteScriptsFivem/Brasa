@@ -113,7 +113,7 @@ namespace Brasa
         public static void Abrir(string url)
         {
             try { Process.Start(new ProcessStartInfo(url) { UseShellExecute = true }); }
-            catch { MessageBox.Show("No se pudo abrir el navegador.\n" + url, "Brasa"); }
+            catch { MessageBox.Show(L.T("No se pudo abrir el navegador.") + "\n" + url, "Brasa"); }
         }
 
         public static void ActivarTls()
@@ -162,7 +162,7 @@ namespace Brasa
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
             Font = Tema.Fuente(9.5f);
-            Text = "Brasa — Términos y condiciones";
+            Text = "Brasa — " + L.T("Términos y condiciones");
             Icon = Recursos.Icono("brasa.ico", 32);
             BackColor = Tema.Fondo;
             ForeColor = Tema.Texto;
@@ -172,9 +172,9 @@ namespace Brasa
             ClientSize = new Size(600, 560);
 
             Controls.Add(new Logo { Location = new Point(20, 18), Size = new Size(50, 50) });
-            var t = Tema.Etiqueta("Antes de empezar", 16f, Tema.Texto, FontStyle.Bold);
+            var t = Tema.Etiqueta(L.T("Antes de empezar"), 16f, Tema.Texto, FontStyle.Bold);
             t.Location = new Point(80, 14);
-            var s = Tema.Etiqueta("Para usar Brasa tienes que aceptar los términos y condiciones.", 9f, Tema.Tenue);
+            var s = Tema.Etiqueta(L.T("Para usar Brasa tienes que aceptar los términos y condiciones."), 9f, Tema.Tenue);
             s.Location = new Point(82, 46);
             Controls.Add(new LogoLT { Location = new Point(530, 18), Size = new Size(50, 50) });
 
@@ -183,13 +183,13 @@ namespace Brasa
             caja.ForeColor = Tema.Texto;
             Terminos.Pintar(caja);
 
-            var chk = Tema.Casilla("He leído y acepto los términos y condiciones");
+            var chk = Tema.Casilla(L.T("He leído y acepto los términos y condiciones"));
             chk.Location = new Point(20, 460);
 
-            var no = Tema.Boton1("No acepto");
+            var no = Tema.Boton1(L.T("No acepto"));
             no.SetBounds(360, 504, 104, 38);
             no.DialogResult = DialogResult.Cancel;
-            var si = Tema.Boton1("Aceptar", true);
+            var si = Tema.Boton1(L.T("Aceptar"), true);
             si.SetBounds(476, 504, 104, 38);
             si.Enabled = false;
             si.DialogResult = DialogResult.OK;
@@ -236,7 +236,7 @@ namespace Brasa
             caja.ForeColor = Tema.Texto;
             caja.Font = Tema.Fuente(9.5f);
             if (texto == Terminos.Texto) Terminos.Pintar(caja); else caja.Text = texto;
-            var ok = Tema.Boton1("Cerrar", true);
+            var ok = Tema.Boton1(L.T("Cerrar"), true);
             ok.SetBounds(444, 470, 100, 36);
             ok.DialogResult = DialogResult.OK;
             Controls.AddRange(new Control[] { caja, ok });

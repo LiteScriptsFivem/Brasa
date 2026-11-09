@@ -98,7 +98,7 @@ namespace Brasa
                 var salida = p.StandardOutput.ReadToEnd();
                 error = p.StandardError.ReadToEnd().Trim();
                 p.WaitForExit(30000);
-                if (p.ExitCode != 0 && error.Length == 0) error = "código " + p.ExitCode;
+                if (p.ExitCode != 0 && error.Length == 0) error = L.T("código ") + p.ExitCode;
                 if (p.ExitCode == 0) error = "";
                 return salida;
             }
@@ -110,17 +110,17 @@ namespace Brasa
             bool ok = true;
             if (bases) ok &= MigrarBases();
             if (archivos) ok &= CopiarHtdocs();
-            log(ok ? "Migración terminada. Ya puedes desinstalar XAMPP si quieres." : "La migración ha terminado con avisos (mira arriba).", !ok);
+            log(ok ? L.T("Migración terminada. Ya puedes desinstalar XAMPP si quieres.") : L.T("La migración ha terminado con avisos (mira arriba)."), !ok);
             return ok;
         }
 
         bool MigrarBases()
         {
             if (!File.Exists(Bin("mysqldump.exe")) || !File.Exists(Bin("mysql.exe")))
-            { log("No encuentro mysqldump.exe en XAMPP.", true); return false; }
+            { log(L.T("No encuentro mysqldump.exe en XAMPP."), true); return false; }
 
             // 1. copia de seguridad de Brasa antes de tocar nada
-            if (motor.MariaDB.Estado == Estado.Encendido) motor.CopiaSeguridad("antes de migrar");
+            if (motor.MariaDB.Estado == Estado.Encendido) motor.CopiaSeguridad(L.T("antes de migrar"));
 
             // 2. poner en marcha el MySQL de XAMPP
             Process temporal = null;
@@ -129,12 +129,12 @@ namespace Brasa
             if (yaEncendido)
             {
                 puerto = PuertoXampp();
-                log("El MySQL de XAMPP ya está encendido (puerto " + puerto + "). Lo uso.");
+                log(L.F("El MySQL de XAMPP ya está encendido (puerto {0}). Lo uso.", puerto));
             }
             else
             {
                 puerto = PuertoLibre();
-                log("Arrancando el MySQL de XAMPP en modo lectura (puerto temporal " + puerto + ")...");
+                log(L.F("Arrancando el MySQL de XAMPP en modo lectura (puerto temporal {0})...", puerto));
                 var psi = new ProcessStartInfo(Bin("mysqld.exe"),
                     "--defaults-file=\"" + MyIni + "\" --port=" + puerto + " --bind-address=127.0.0.1 --skip-grant-tables --skip-slave-start")
                 { UseShellExecute = false, CreateNoWindow = true, WorkingDirectory = Path.Combine(Carpeta, "mysql") };
@@ -143,7 +143,7 @@ namespace Brasa
                 while (DateTime.Now < lim && !Motor.Escuchando(puerto) && !temporal.HasExited) Thread.Sleep(400);
                 if (!Motor.Escuchando(puerto))
                 {
-                    log("El MySQL de XAMPP no arranca. Puede que sus datos estén dañados (un fallo típico de XAMPP).", true);
+                    log(L.T("El MySQL de XAMPP no arranca. Puede que sus datos estén dañados (un fallo típico de XAMPP)."), true);
                     var err = Path.Combine(Carpeta, @"mysql\data\mysql_error.log");
                     if (File.Exists(err))
                         try
@@ -169,25 +169,25 @@ namespace Brasa
                 var lista = Cliente(puerto, "SHOW DATABASES", out error);
                 if (error.Length > 0)
                 {
-                    log("No puedo leer las bases de datos de XAMPP: " + error, true);
-                    if (yaEncendido) log("Si root tiene contraseña: para MySQL en el panel de XAMPP (Stop) y pulsa Migrar otra vez.", true);
+                    log(L.T("No puedo leer las bases de datos de XAMPP: ") + error, true);
+                    if (yaEncendido) log(L.T("Si root tiene contraseña: para MySQL en el panel de XAMPP (Stop) y pulsa Migrar otra vez."), true);
                     return false;
                 }
                 var bases = lista.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
                     .Select(x => x.Trim()).Where(x => x.Length > 0 && !BasesSistema.Contains(x.ToLowerInvariant())).ToList();
-                if (bases.Count == 0) { log("XAMPP no tiene bases de datos tuyas. Nada que pasar."); return true; }
-                log("Bases encontradas: " + string.Join(", ", bases));
+                if (bases.Count == 0) { log(L.T("XAMPP no tiene bases de datos tuyas. Nada que pasar.")); return true; }
+                log(L.T("Bases encontradas: ") + string.Join(", ", bases));
 
                 // 4. exportar
                 Directory.CreateDirectory(motor.DirBackups);
                 archivo = Path.Combine(motor.DirBackups, "xampp-" + DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss") + ".sql");
-                log("Exportando desde XAMPP...");
+                log(L.T("Exportando desde XAMPP..."));
                 var args = "-u root --host=127.0.0.1 --port=" + puerto +
                            " --routines --events --triggers --single-transaction --default-character-set=utf8mb4" +
                            " --result-file=\"" + archivo + "\" --databases " + string.Join(" ", bases.Select(b => "\"" + b + "\""));
                 var e2 = Motor.Ejecutar(Bin("mysqldump.exe"), args, 30 * 60 * 1000);
-                if (e2.Length > 0) { log("Error al exportar: " + e2, true); return false; }
-                log("Exportado: " + Path.GetFileName(archivo) + " (" + new FileInfo(archivo).Length / 1024 + " KB). Se guarda en Copias.");
+                if (e2.Length > 0) { log(L.T("Error al exportar: ") + e2, true); return false; }
+                log(L.F("Exportado: {0} ({1} KB). Se guarda en Copias.", Path.GetFileName(archivo), new FileInfo(archivo).Length / 1024));
             }
             finally
             {
@@ -198,13 +198,13 @@ namespace Brasa
                 while (DateTime.Now < lim && ProcesosXampp().Count > 0) Thread.Sleep(300);
                 foreach (var p in ProcesosXampp()) using (p) { try { p.Kill(); } catch { } }
                 if (temporal != null) temporal.Dispose();
-                log("MySQL de XAMPP apagado.");
+                log(L.T("MySQL de XAMPP apagado."));
             }
 
             // 6. importar en Brasa
             if (motor.MariaDB.Estado != Estado.Encendido)
             {
-                log("Encendiendo MariaDB de Brasa...");
+                log(L.T("Encendiendo MariaDB de Brasa..."));
                 if (!motor.Arrancar(motor.MariaDB)) return false;
             }
             return motor.ImportarCompleto(archivo);
@@ -213,9 +213,9 @@ namespace Brasa
         bool CopiarHtdocs()
         {
             var origen = Path.Combine(Carpeta, "htdocs");
-            if (!Directory.Exists(origen)) { log("XAMPP no tiene carpeta htdocs.", true); return false; }
+            if (!Directory.Exists(origen)) { log(L.T("XAMPP no tiene carpeta htdocs."), true); return false; }
             Directory.CreateDirectory(motor.DirWww);
-            log("Copiando tus proyectos de htdocs a www (no se sobrescribe nada que ya exista)...");
+            log(L.T("Copiando tus proyectos de htdocs a www (no se sobrescribe nada que ya exista)..."));
             int copiados = 0, saltados = 0;
             foreach (var entrada in Directory.GetFileSystemEntries(origen))
             {
@@ -228,7 +228,7 @@ namespace Brasa
                 }
                 Copiar(entrada, Path.Combine(motor.DirWww, nombre), ref copiados, ref saltados);
             }
-            log("Archivos copiados: " + copiados + (saltados > 0 ? " (" + saltados + " ya existían y no se han tocado)" : "") + ".");
+            log(L.T("Archivos copiados: ") + copiados + (saltados > 0 ? " " + L.F("({0} ya existían y no se han tocado)", saltados) : "") + ".");
             return true;
         }
 
@@ -243,7 +243,7 @@ namespace Brasa
             }
             if (File.Exists(hasta)) { saltados++; return; }
             try { File.Copy(desde, hasta); copiados++; }
-            catch (Exception ex) { log("No se pudo copiar " + desde + ": " + ex.Message, true); }
+            catch (Exception ex) { log(L.F("No se pudo copiar {0}: {1}", desde, ex.Message), true); }
         }
     }
 
@@ -266,7 +266,7 @@ namespace Brasa
             AutoScaleDimensions = new SizeF(96F, 96F);
             AutoScaleMode = AutoScaleMode.Dpi;
             Font = Tema.Fuente(9.5f);
-            Text = "Migrar desde XAMPP";
+            Text = L.T("Migrar desde XAMPP");
             Icon = Recursos.Icono("brasa.ico", 32);
             BackColor = Tema.Fondo;
             ForeColor = Tema.Texto;
@@ -275,39 +275,39 @@ namespace Brasa
             StartPosition = FormStartPosition.CenterParent;
             ClientSize = new Size(560, 500);
 
-            var t = Tema.Etiqueta("Migrar desde XAMPP a Brasa", 14f, Tema.Texto, FontStyle.Bold);
+            var t = Tema.Etiqueta(L.T("Migrar desde XAMPP a Brasa"), 14f, Tema.Texto, FontStyle.Bold);
             t.Location = new Point(20, 16);
-            var s = Tema.Etiqueta("Copia tus bases de datos y tus proyectos. XAMPP no se borra ni se modifica.", 9f, Tema.Tenue);
+            var s = Tema.Etiqueta(L.T("Copia tus bases de datos y tus proyectos. XAMPP no se borra ni se modifica."), 9f, Tema.Tenue);
             s.Location = new Point(22, 48);
 
-            var l1 = Tema.Seccion("CARPETA DE XAMPP", 20, 84);
+            var l1 = Tema.Seccion(L.T("CARPETA DE XAMPP"), 20, 84);
             txt = new TextBox { Location = new Point(20, 106), Width = 410, BackColor = Tema.Tarjeta, ForeColor = Tema.Texto, BorderStyle = BorderStyle.FixedSingle, Font = Tema.Fuente(10.5f) };
             txt.Text = MigradorXampp.Buscar() ?? @"C:\xampp";
-            var cambiar = Tema.Boton1("Cambiar...");
+            var cambiar = Tema.Boton1(L.T("Cambiar..."));
             cambiar.SetBounds(440, 104, 100, 30);
             cambiar.Click += (o, e) =>
             {
-                using (var d = new FolderBrowserDialog { Description = "Elige la carpeta de XAMPP (la que tiene mysql y htdocs)" })
+                using (var d = new FolderBrowserDialog { Description = L.T("Elige la carpeta de XAMPP (la que tiene mysql y htdocs)") })
                     if (d.ShowDialog(this) == DialogResult.OK) txt.Text = d.SelectedPath;
             };
 
-            chkBases = Tema.Casilla("Bases de datos (todas las tuyas)"); chkBases.Location = new Point(20, 148); chkBases.Checked = true;
-            chkArchivos = Tema.Casilla("Proyectos de htdocs → carpeta www"); chkArchivos.Location = new Point(20, 174); chkArchivos.Checked = true;
+            chkBases = Tema.Casilla(L.T("Bases de datos (todas las tuyas)")); chkBases.Location = new Point(20, 148); chkBases.Checked = true;
+            chkArchivos = Tema.Casilla(L.T("Proyectos de htdocs → carpeta www")); chkArchivos.Location = new Point(20, 174); chkArchivos.Checked = true;
 
-            var nota = Tema.Etiqueta("Antes de empezar, Brasa hace una copia de seguridad. Si en Brasa ya existe una base con el mismo nombre, sus tablas se sustituyen por las de XAMPP.", 8.5f, Tema.Ambar);
+            var nota = Tema.Etiqueta(L.T("Antes de empezar, Brasa hace una copia de seguridad. Si en Brasa ya existe una base con el mismo nombre, sus tablas se sustituyen por las de XAMPP."), 8.5f, Tema.Ambar);
             nota.AutoSize = false;
             nota.Bounds = new Rectangle(20, 204, 520, 36);
-            var marca = Tema.Etiqueta("XAMPP pertenece a sus autores. Brasa no está afiliado ni respaldado por ellos: solo lee tus propios datos para copiarlos.", 8f, Tema.Tenue);
+            var marca = Tema.Etiqueta(L.T("XAMPP pertenece a sus autores. Brasa no está afiliado ni respaldado por ellos: solo lee tus propios datos para copiarlos."), 8f, Tema.Tenue);
             marca.AutoSize = false;
             marca.Bounds = new Rectangle(20, 240, 520, 30);
 
             barra = new ProgressBar { Location = new Point(20, 274), Size = new Size(520, 6), Style = ProgressBarStyle.Marquee, MarqueeAnimationSpeed = 0, Visible = false };
             caja = Tema.CajaTexto(new Rectangle(20, 286, 520, 156));
 
-            btnCerrar = Tema.Boton1("Cerrar");
+            btnCerrar = Tema.Boton1(L.T("Cerrar"));
             btnCerrar.SetBounds(320, 452, 100, 36);
             btnCerrar.Click += (o, e) => Close();
-            btnMigrar = Tema.Boton1("Migrar", true);
+            btnMigrar = Tema.Boton1(L.T("Migrar"), true);
             btnMigrar.SetBounds(430, 452, 110, 36);
             btnMigrar.Click += (o, e) => Empezar();
 
@@ -315,8 +315,8 @@ namespace Brasa
             ResumeLayout(false);
             PerformLayout();
 
-            Escribir(MigradorXampp.EsXampp(txt.Text) ? "XAMPP encontrado en " + txt.Text + "." : "No encuentro XAMPP. Elige su carpeta con Cambiar...", !MigradorXampp.EsXampp(txt.Text));
-            FormClosing += (o, e) => { if (trabajando) { e.Cancel = true; Escribir("Espera a que termine la migración.", true); } };
+            Escribir(MigradorXampp.EsXampp(txt.Text) ? L.F("XAMPP encontrado en {0}.", txt.Text) : L.T("No encuentro XAMPP. Elige su carpeta con Cambiar..."), !MigradorXampp.EsXampp(txt.Text));
+            FormClosing += (o, e) => { if (trabajando) { e.Cancel = true; Escribir(L.T("Espera a que termine la migración."), true); } };
         }
 
         void Escribir(string m, bool error = false)
@@ -331,14 +331,14 @@ namespace Brasa
         void Empezar()
         {
             var carpeta = txt.Text.Trim().TrimEnd('\\');
-            if (!MigradorXampp.EsXampp(carpeta)) { Escribir("En esa carpeta no hay un XAMPP (falta mysql\\bin\\mysqld.exe).", true); return; }
+            if (!MigradorXampp.EsXampp(carpeta)) { Escribir(L.T("En esa carpeta no hay un XAMPP (falta mysql\\bin\\mysqld.exe)."), true); return; }
             if (!chkBases.Checked && !chkArchivos.Checked) return;
-            if (!motor.Instalado) { Escribir("Brasa no está instalado del todo. Ejecuta el instalador antes.", true); return; }
+            if (!motor.Instalado) { Escribir(L.T("Brasa no está instalado del todo. Ejecuta el instalador antes."), true); return; }
 
             trabajando = true;
             motor.Migrando = true;
             btnMigrar.Enabled = btnCerrar.Enabled = false;
-            btnMigrar.Text = "Migrando...";
+            btnMigrar.Text = L.T("Migrando...");
             barra.Visible = true; barra.MarqueeAnimationSpeed = 30;
             bool bases = chkBases.Checked, archivos = chkArchivos.Checked;
             Action<string, bool> registro = (m, e) => Escribir(m, e);
@@ -348,7 +348,7 @@ namespace Brasa
             {
                 bool ok = false;
                 try { ok = new MigradorXampp(motor, carpeta, (m, e) => Escribir(m, e)).Migrar(bases, archivos); }
-                catch (Exception ex) { Escribir("Error: " + ex.Message, true); }
+                catch (Exception ex) { Escribir(L.T("Error: ") + ex.Message, true); }
                 finally { motor.Migrando = false; motor.Registro -= registro; }
                 BeginInvoke(new Action(() =>
                 {
@@ -356,7 +356,7 @@ namespace Brasa
                     barra.MarqueeAnimationSpeed = 0; barra.Visible = false;
                     btnCerrar.Enabled = true;
                     btnMigrar.Enabled = true;
-                    btnMigrar.Text = ok ? "Hecho" : "Reintentar";
+                    btnMigrar.Text = ok ? L.T("Hecho") : L.T("Reintentar");
                     var h = Terminado; if (h != null) h();
                 }));
             }) { IsBackground = true }.Start();
