@@ -32,6 +32,7 @@ namespace Brasa
         public DateTime? Inicio;
         public long MemoriaMB;
         public readonly List<DateTime> Reinicios = new List<DateTime>();
+        public int FallosPuerto;          // comprobaciones seguidas sin ver el puerto (evita parpadeos)
     }
 
     /// Lógica de arranque, parada y estado. No toca la interfaz.
@@ -141,7 +142,24 @@ namespace Brasa
 
         public static bool Escuchando(int puerto)
         {
-            try { return IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners().Any(e => e.Port == puerto); }
+            // La tabla de puertos de Windows a veces falla o llega incompleta: si no aparece, se prueba a conectar
+            try { if (IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners().Any(e => e.Port == puerto)) return true; }
+            catch { }
+            return Responde(puerto);
+        }
+
+        static bool Responde(int puerto)
+        {
+            try
+            {
+                using (var c = new System.Net.Sockets.TcpClient())
+                {
+                    var r = c.BeginConnect(System.Net.IPAddress.Loopback, puerto, null, null);
+                    if (!r.AsyncWaitHandle.WaitOne(300)) return false;
+                    c.EndConnect(r);
+                    return true;
+                }
+            }
             catch { return false; }
         }
 
@@ -198,8 +216,10 @@ namespace Brasa
                 s.Inicio = ini;
 
                 if (s.Ocupado) return; // el estado lo pone la operación en curso
-                if (procs.Count == 0) { if (s.Estado != Estado.Error) s.Estado = Estado.Apagado; }
-                else s.Estado = Escuchando(s.Puerto) ? Estado.Encendido : Estado.Arrancando;
+                if (procs.Count == 0) { s.FallosPuerto = 0; if (s.Estado != Estado.Error) s.Estado = Estado.Apagado; }
+                else if (Escuchando(s.Puerto)) { s.FallosPuerto = 0; s.Estado = Estado.Encendido; }
+                else if (s.Estado == Estado.Encendido && ++s.FallosPuerto < 4) { }   // un fallo suelto no lo baja a "Arrancando"
+                else s.Estado = Estado.Arrancando;
             }
             finally { foreach (var p in procs) p.Dispose(); }
         }
@@ -336,7 +356,11 @@ namespace Brasa
                 }
                 else MatarProcesos(s);
 
-                s.Estado = Estado.Apagado; s.Detalle = "";
+                // esperar a que Windows suelte el puerto, para que un "Reiniciar" no lo vea ocupado
+                var libre = DateTime.Now.AddSeconds(5);
+                while (DateTime.Now < libre && Escuchando(s.Puerto)) Thread.Sleep(250);
+
+                s.Estado = Estado.Apagado; s.Detalle = ""; s.FallosPuerto = 0;
                 Log(L.F("{0} apagado.", s.Nombre));
             }
             finally { s.Ocupado = false; }

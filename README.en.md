@@ -23,7 +23,7 @@
 ## What it does
 
 - **One-click installer.** Downloads Apache, PHP, MariaDB and phpMyAdmin from their official websites and configures everything.
-- **Panel and tray icon.** Start, stop and check the status of each service. Closing the window with the X keeps it running next to the clock, with an icon whose color changes with the status.
+- **Panel and tray icon.** Start, stop and check the status of each service. Closing the window with the X keeps it running in the bottom-right corner of the screen (^ arrow), with an icon whose color changes with the status.
 - **Watchdog.** If Apache or MariaDB crash, it starts them again.
 - **Clean MariaDB shutdown**, also when Windows shuts down, so your tables don't get corrupted.
 - **Backups**, automatic daily and manual (keeps the last 15).
@@ -50,12 +50,22 @@ Requirements: 64-bit Windows 10 or 11 (includes .NET Framework 4.8) and an inter
 
 ## Building from source
 
-It is compiled with Mono against the .NET Framework 4.7.2 libraries, so it runs on any Windows 10/11 without installing anything:
+The program uses .NET Framework 4.x, which comes with Windows 10/11, so it runs without installing anything. Both ways of building produce `build/Brasa.exe` and `build/Brasa-Instalador.exe`.
+
+**On Windows** (uses the `csc.exe` that ships with Windows, nothing to install):
+
+```powershell
+powershell -ExecutionPolicy Bypass -File build.ps1
+```
+
+**On Linux** (with Mono):
 
 ```bash
 sudo apt install mono-devel        # or mono-complete
-./build.sh                          # produces build/Brasa.exe and build/Brasa-Instalador.exe
+./build.sh
 ```
+
+To try the panel, install it with `Brasa-Instalador.exe`. A standalone `build/Brasa.exe` looks for Apache and MariaDB in its own folder and will say Brasa isn't installed.
 
 To regenerate the icons: `python3 tools/iconos.py res` (requires Pillow).
 

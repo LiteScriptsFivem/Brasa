@@ -6,7 +6,7 @@ namespace Brasa
 {
     static class Terminos
     {
-        public const string Version = "1.2.0";
+        public const string Version = "1.2.1";
 
         /// Escribe los términos con los títulos en negrita
         public static void Pintar(RichTextBox caja)

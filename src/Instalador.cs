@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
@@ -317,8 +318,28 @@ namespace Brasa
 
         // ================= Instalación =================
 
+        static List<Process> PanelesAbiertos(string exe)
+        {
+            var lista = new List<Process>();
+            foreach (var p in Process.GetProcessesByName("Brasa"))
+            {
+                var r = Motor.RutaDe(p.Id);
+                if (r != null && string.Equals(r, exe, StringComparison.OrdinalIgnoreCase)) lista.Add(p);
+                else p.Dispose();
+            }
+            return lista;
+        }
+
         void Instalar()
         {
+            var abiertos = PanelesAbiertos(Path.Combine(Path.GetFullPath(txtCarpeta.Text.Trim()), "Brasa.exe"));
+            bool hayAbierto = abiertos.Count > 0;
+            foreach (var p in abiertos) p.Dispose();
+            if (hayAbierto && MessageBox.Show(this,
+                    L.T("Brasa está abierto. Para instalar hay que cerrarlo (se apagarán Apache y MariaDB).\n\n¿Cerrar Brasa ahora?"),
+                    L.T("Cerrar Brasa"), MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                return;
+
             carpetaFinal = Path.GetFullPath(txtCarpeta.Text.Trim());
             instalando = true; fallo = false; paso = 0;
             lock (todo) todo.Clear();
@@ -346,11 +367,16 @@ namespace Brasa
             Directory.CreateDirectory(carpeta);
             var exe = Path.Combine(carpeta, "Brasa.exe");
 
-            foreach (var p in Process.GetProcessesByName("Brasa"))
+            var abiertos = PanelesAbiertos(exe);
+            if (abiertos.Count > 0)
             {
-                var r = Motor.RutaDe(p.Id);
-                if (r != null && string.Equals(r, exe, StringComparison.OrdinalIgnoreCase))
-                    return L.T("Brasa está abierto. Ciérralo (icono junto al reloj → Salir) y pulsa Reintentar.");
+                // el panel apaga Apache y MariaDB de forma limpia y se cierra solo
+                Linea(L.T("Cerrando Brasa (apaga Apache y MariaDB)..."));
+                try { using (var ev = EventWaitHandle.OpenExisting("Local\\Brasa_Panel_Salir")) ev.Set(); } catch { }
+                bool cerrado = true;
+                foreach (var p in abiertos) using (p) { try { if (!p.WaitForExit(90000)) cerrado = false; } catch { } }
+                if (!cerrado) return L.T("Brasa no se ha podido cerrar. Ciérralo desde su menú (Salir) y pulsa Reintentar.");
+                Linea(L.T("Brasa cerrado."));
             }
 
             Linea(L.F("Copiando archivos a {0}", carpeta));
@@ -473,7 +499,7 @@ namespace Brasa
                     "•  Web:   http://localhost" + (numWeb.Value == 80 ? "" : ":" + numWeb.Value) + "/\n" +
                     "•  " + L.T("Base de datos:   localhost · usuario root · sin contraseña") + "\n" +
                     "•  " + L.T("¿Tienes datos en XAMPP? En Brasa pulsa «Migrar desde XAMPP».") + "\n\n" +
-                    L.T("Al cerrar Brasa con la X sigue funcionando junto al reloj.");
+                    L.T("Al cerrar Brasa con la X sigue funcionando: lo tienes en la esquina inferior derecha de la pantalla (si no lo ves, pulsa la flecha ^).");
                 Ir(Pagina.Fin);
             }
             else

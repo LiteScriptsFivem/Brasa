@@ -288,7 +288,7 @@ namespace Brasa
                 f.Version.Top = f.Nombre.Top + (f.Nombre.Height - f.Version.Height) / 2 + 1;
             }
 
-            Escribir(L.T("Brasa listo. Al cerrar con la X sigue funcionando junto al reloj."));
+            Escribir(L.T("Brasa listo. Al cerrar con la X sigue funcionando en la esquina inferior derecha de la pantalla (flecha ^)."));
             motor.Refrescar(motor.Apache);
             motor.Refrescar(motor.MariaDB);
             if (motor.Apache.Estado == Estado.Encendido) motor.Apache.Deseado = true;
@@ -330,7 +330,7 @@ namespace Brasa
                 Hide();
                 if (!ajustes.Bool("AvisoBandeja", false))
                 {
-                    bandeja.ShowBalloonTip(4000, L.T("Brasa sigue funcionando"), L.T("Lo tienes aquí, junto al reloj. Clic para abrirlo; clic derecho para el menú."), ToolTipIcon.Info);
+                    bandeja.ShowBalloonTip(4000, L.T("Brasa sigue funcionando"), L.T("Lo tienes aquí, en la esquina inferior derecha de la pantalla. Clic para abrirlo; clic derecho para el menú."), ToolTipIcon.Info);
                     GuardarAjuste("AvisoBandeja", true);
                 }
                 return;
